@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="170dp"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="116dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:text="Delete"
+            android:textColor="#000"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/textView2"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="48dp"
+            android:text="Delete this photo from device permanently?"
+            android:textAlignment="center" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:background="#DCC" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        style="?android:attr/buttonBarStyle"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:background="#FFFFFF">
+
+        <Button
+            android:id="@+id/deleteDialogCancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textColor="#555"
+            android:textAllCaps="false" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#CCC"/>
+        <Button
+            android:id="@+id/deleteDialogDelete"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_weight="1"
+            android:text="Delete"
+            android:textColor="@color/colorPrimary"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+</LinearLayout>

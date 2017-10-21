@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="64dp">
+
+    <ImageView
+        android:id="@+id/noti_album_art"
+        android:layout_width="64dp"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/noti_album_art"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/noti_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:text="Song Name"
+                android:maxLines="1"
+                android:textSize="14sp"
+                android:textColor="#202020"
+                android:layout_alignParentStart="true" />
+            <TextView
+                android:id="@+id/noti_vd_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="0dp"
+                android:text="00:00/03:23"
+                android:layout_below="@+id/noti_title"
+                android:layout_alignParentStart="true" />
+
+
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/noti_vd_prev"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:tint="#202020"
+            app:srcCompat="@android:drawable/ic_media_previous" />
+        <ImageView
+            android:id="@+id/noti_vd_play"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:tint="#202020"
+            app:srcCompat="@android:drawable/ic_media_play" />
+        <ImageView
+            android:id="@+id/noti_vd_next"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:tint="#202020"
+            app:srcCompat="@android:drawable/ic_media_next" />
+    </LinearLayout>
+
+
+</RelativeLayout>

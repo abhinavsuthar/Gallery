@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Smart Gallery</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-8656290775789159/5555620530</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-8656290775789159/5612418715</string>
+    <string name="rewarded_video_ad_unit_id">ca-app-pub-8656290775789159/9925878873</string>
+
+</resources>

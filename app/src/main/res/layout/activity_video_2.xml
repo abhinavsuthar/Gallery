@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/video_2_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    tools:context="com.developer.abhinav_suthar.gallery.Video2"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center" />
+
+    <LinearLayout
+        android:id="@+id/v2TopLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:layout_gravity="top"
+        android:background="#AA000000"
+        android:visibility="visible"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/v2imgBackButton"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:padding="17dp"
+            app:srcCompat="@drawable/back_arrow"
+            android:backgroundTint="#000" />
+
+        <TextView
+            android:id="@+id/v2txtVdName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#FFF"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:text="This is the video name" />
+
+        <ImageView
+            android:id="@+id/v2imgBackgroundPlay"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:padding="16dp"
+            app:srcCompat="@drawable/background" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/v2BottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#CC000000"
+        android:orientation="vertical"
+        android:layoutDirection="ltr"
+        android:layout_gravity="bottom">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="4dip"
+            android:orientation="horizontal">
+
+            <ImageButton android:id="@+id/v2prev" style="@android:style/MediaButton.Previous" />
+            <ImageButton android:id="@+id/v2rew" style="@android:style/MediaButton.Rew" />
+            <ImageButton android:id="@+id/v2pause" style="@android:style/MediaButton.Pause" />
+            <ImageButton android:id="@+id/v2ffwd" style="@android:style/MediaButton.Ffwd" />
+            <ImageButton android:id="@+id/v2next" style="@android:style/MediaButton.Next" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView android:id="@+id/v2time_current"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:paddingTop="4dip"
+                android:paddingStart="4dip"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="4dip"
+                android:textColor="#FFF" />
+
+            <SeekBar
+                android:id="@+id/v2mediacontroller_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dip"
+                android:layout_weight="1"
+                android:layout_height="32dip" />
+
+            <TextView android:id="@+id/v2time"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:paddingTop="4dip"
+                android:paddingEnd="4dip"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dip"
+                android:textColor="#FFF" />
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>

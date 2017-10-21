@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent" >
+
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context="com.developer.abhinav_suthar.gallery.About"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/about_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/feedback" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_toEndOf="@+id/imageView"
+                    android:text="Send Feedback"
+                    android:textSize="18sp"
+                    android:textColor="#000"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/about_improve"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/improve_app" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_toEndOf="@+id/imageView1"
+                    android:text="Improve App"
+                    android:textSize="18sp"
+                    android:textColor="#000"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/about_about_me"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/about_me" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_toEndOf="@+id/imageView2"
+                    android:text="About Me"
+                    android:textSize="18sp"
+                    android:textColor="#000"/>
+
+                <ImageView
+                    android:id="@+id/about_whatsAppMe"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:padding="18dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/whatsapp_icon" />
+
+                <ImageView
+                    android:id="@+id/about_callMe"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:padding="22dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/about_whatsAppMe"
+                    app:srcCompat="@drawable/phone_icon" />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/about_support_me"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/support_me_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_toEndOf="@+id/imageView3"
+                    android:text="Support Me ! ! !"
+                    android:textSize="18sp"
+                    android:textColor="#000" />
+
+                <TextView
+                    android:id="@+id/about_clickMe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    android:text="Click Me"
+                    android:textColor="#0000FF"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/banner_ad_unit_id"/>
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/banner_ad_unit_id"
+                android:layout_below="@+id/adView20"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView22"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/banner_ad_unit_id"
+                android:layout_below="@+id/adView21"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/banner_ad_unit_id"
+                android:layout_below="@+id/adView22"
+                android:layout_marginTop="8dp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</ScrollView>

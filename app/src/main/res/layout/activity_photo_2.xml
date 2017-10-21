@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.developer.abhinav_suthar.gallery.Photo2">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <RelativeLayout
+        android:id="@+id/p2TopLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:layout_gravity="top"
+        android:background="#AA000000"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/imgBackButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="16dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/back_arrow"
+            android:backgroundTint="#000" />
+
+        <TextView
+            android:id="@+id/txtImgDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#FFF"
+            android:maxLines="1"
+            android:text="12 August, 2017"
+            android:layout_alignTop="@+id/imgBackButton"
+            android:layout_toEndOf="@+id/imgBackButton" />
+
+        <TextView
+            android:id="@+id/txtImgTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:textColor="#FFF"
+            android:maxLines="1"
+            android:layout_below="@+id/txtImgDate"
+            android:layout_toEndOf="@+id/imgBackButton"
+            android:text="21:41" />
+
+        <ImageView
+            android:id="@+id/imgStopSlideShow"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:visibility="gone"
+            android:padding="12dp"
+            android:tint="#FF0000"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/p2BottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_gravity="bottom"
+        android:background="#AA000000"
+        android:visibility="visible"
+        android:elevation="5dp"
+        android:clickable="true"
+        app:layout_anchor="@id/container"
+        app:layout_anchorGravity="bottom">
+
+        <ImageView
+            android:id="@+id/p2ImgDelete"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="31dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:srcCompat="@drawable/delete"
+            android:backgroundTint="#000"
+            android:foregroundTint="#000"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/p2ImgShare"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="31dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="12dp"
+            android:layout_toStartOf="@+id/p2ImgDelete"
+            app:srcCompat="@drawable/share" />
+
+        <ImageView
+            android:id="@+id/p2ImgMore"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="31dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="12dp"
+            android:layout_toEndOf="@+id/p2ImgDelete"
+            app:srcCompat="@drawable/more_dots" />
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/p2ImgShare"
+            android:layout_alignEnd="@+id/p2ImgShare"
+            android:layout_below="@+id/p2ImgShare"
+            android:layout_marginTop="-21dp"
+            android:text="Share"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:textColor="#FFF" />
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/p2ImgDelete"
+            android:layout_toStartOf="@+id/p2ImgDelete"
+            android:layout_alignEnd="@+id/p2ImgDelete"
+            android:layout_marginTop="-21dp"
+            android:text="Delete"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:textColor="#FFF" />
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/p2ImgMore"
+            android:layout_alignEnd="@+id/p2ImgMore"
+            android:layout_below="@+id/p2ImgMore"
+            android:layout_marginTop="-21dp"
+            android:text="More"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:textColor="#FFF"/>
+    </RelativeLayout>
+
+</FrameLayout>

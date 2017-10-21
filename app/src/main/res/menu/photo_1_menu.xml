@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/photo_1_action_search"
+        android:title="Search"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
+    <item
+        android:title="Sort by"
+        app:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="all">
+                <item
+                    android:id="@+id/photo_1_action_title"
+                    android:title="Title"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/photo_1_action_size"
+                    android:title="Size"
+                    app:showAsAction="never" />
+                <item
+                    android:id="@+id/photo_1_action_date"
+                    android:title="Date Modified"
+                    app:showAsAction="never"/>
+            </group>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/photo_1_action_menu_sort_asc"
+                    android:title="Ascending"/>
+                <item
+                    android:id="@+id/photo_1_action_menu_sort_dsc"
+                    android:title="Descending"/>
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/photo_1_action_about"
+        android:title="About"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/video_1_auto_play"
+        android:title="Auto Play Next"
+        android:checkable="true"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/video_1_action_background_play"
+        android:title="Background Play"
+        android:checkable="true"
+        android:visible="false"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/video_1_action_offscreen_play"
+        android:title="OffScreen Play"
+        android:checkable="true"
+        android:visible="false"
+        app:showAsAction="never"/>
+</menu>

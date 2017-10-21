@@ -1,0 +1,15 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.developer.abhinav_suthar.gallery.MainActivity$PlaceholderFragment">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/viewPhotos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="0.5dp"
+        android:scrollbars="vertical"/>
+
+</RelativeLayout>
