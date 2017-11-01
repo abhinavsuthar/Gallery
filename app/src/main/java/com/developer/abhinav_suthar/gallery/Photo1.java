@@ -1,5 +1,6 @@
 package com.developer.abhinav_suthar.gallery;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,7 +16,12 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +41,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -59,6 +66,7 @@ public class Photo1 extends AppCompatActivity {
     public Context context;
     private String albumName;
     private int photoPosition = 0;
+    private int pagerPosition = 0;
     private RecyclerView recyclerView;
     private ArrayList<HashMap<String, String>> imageList = new ArrayList<>();
     private Menu menu;
@@ -72,19 +80,22 @@ public class Photo1 extends AppCompatActivity {
         albumName = getIntent().getExtras().getString("key_album");
 
         context = this;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.photo_1_toolBar);
+        Toolbar toolbar = findViewById(R.id.photo_1_toolBar);
         toolbar.setTitle(albumName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        LoadAlbum loadAlbum = new LoadAlbum();
-        loadAlbum.execute(albumName);
-        loadBannerAd();
+        //LoadAlbum loadAlbum = new LoadAlbum();
+        //loadAlbum.execute(albumName);
+        loadPhoto(1);
+        //loadBannerAd();
+
+        recyclerView = findViewById(R.id.viewPhotos);
     }
 
     private void loadBannerAd(){
-        final AdView mAdView = (AdView) findViewById(R.id.adView01);
+        final AdView mAdView = findViewById(R.id.adView01);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AdListener() {
@@ -95,19 +106,89 @@ public class Photo1 extends AppCompatActivity {
         });
     }
 
+    private void loadPhoto(int position){
+
+        // Set up the ViewPager with the sections adapter.
+        ViewPager mViewPager = findViewById(R.id.photo_1_viewPager);
+        mViewPager.setAdapter(new FullScreenImageAdapter());
+        //mViewPager.setCurrentItem(0);
+        //mViewPager.setPageMargin(dp2Pixels(context, 10));
+        //mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                pagerPosition = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+    }
+
+    /**
+     * ViewPager Adapter
+     */
+    private class FullScreenImageAdapter extends PagerAdapter {
+
+        LoadAlbum loadAlbum = new LoadAlbum();
+
+        @Override
+        public int getCount() {
+            return Utils.getImageAlbumNames().size()-1;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == (object);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Toast.makeText(context, "ViewPagerPosition"+pagerPosition, Toast.LENGTH_SHORT).show();
+
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View viewLayout = inflater.inflate(R.layout.tab1_photos, container, false);
+
+            recyclerView = findViewById(R.id.viewPhotos);
+
+            loadAlbum.execute(Utils.getImageAlbumNames().get(position));
+
+            (container).addView(viewLayout);
+
+            return viewLayout;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            (container).removeView((RelativeLayout) object);
+
+        }
+
+    }
+
     private class LoadAlbum extends AsyncTask<String, Void, String> {
 
-        String albumName;
+        //String albumName;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            imageList.clear();
         }
 
         @Override
         protected String doInBackground(String... strings) {
 
-            albumName = strings[0];
+            String albumName = strings[0];
             String path, path2, size, height, width, displayName, timestamp;
 
             Uri uriExternal = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -153,8 +234,10 @@ public class Photo1 extends AppCompatActivity {
             super.onPostExecute(s);
 
             if (imageList.size() == 0) finish();
+            Utils.setMediaList(imageList);
+            Toast.makeText(context, "ImageList"+imageList.size(), Toast.LENGTH_SHORT).show();
 
-            recyclerView = (RecyclerView) findViewById(R.id.viewSingleAlbum);
+            recyclerView = findViewById(R.id.viewPhotos);
             PhotoAdapter adapter = new PhotoAdapter(imageList);
 
             GridLayoutManager layoutManager;
@@ -221,14 +304,12 @@ public class Photo1 extends AppCompatActivity {
                 });
             }else{
                 holder.checkBox.setVisibility(View.GONE);
-                holder.checkBox.setChecked(false);
 
                 holder.albumImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
                         Intent intent = new Intent(context, Photo2.class);
-                        intent.putExtra("key_list", albumList);
                         intent.putExtra("key_position", holder.getAdapterPosition());
 
                         startActivityForResult(intent, 501);

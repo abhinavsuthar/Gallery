@@ -3,7 +3,9 @@ package com.developer.abhinav_suthar.gallery.extras;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.developer.abhinav_suthar.gallery.R;
 
@@ -28,6 +30,13 @@ public class Utils {
     private static ArrayList<String> AlbumNameV = new ArrayList<>();
     private static ArrayList<String> AlbumPathV = new ArrayList<>();
 
+    //Photo1 to Photo2 and Video1 to Video2
+    private static ArrayList<HashMap<String, String>> mediaList = new ArrayList<>();
+    public static void setMediaList(ArrayList<HashMap<String, String>> mediaListt){ mediaList = mediaListt;}
+    public static ArrayList<HashMap<String, String>> getMediaList(){
+        Log.e("List Size", ""+mediaList.size());
+        return mediaList; }
+
     //Photos
     public static void ImageAlbumDetails(ArrayList<HashMap<String, String>> AlbumList){
         AlbumName.clear();
@@ -42,9 +51,7 @@ public class Utils {
         AlbumName.add("Make New Folder ! ! !");
     }
 
-    public static ArrayList<String> getImageAlbumNames(){
-        return AlbumName;
-    }
+    public static ArrayList<String> getImageAlbumNames(){ return AlbumName; }
 
     public static ArrayList<String> getImageAlbumPath(){
         return AlbumPath;

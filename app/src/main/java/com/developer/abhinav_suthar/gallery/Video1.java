@@ -167,7 +167,9 @@ public class Video1 extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            recyclerView = (RecyclerView) findViewById(R.id.recyclerVideoAlbum);
+            if(videoAlbumList.size()==0) finish();
+            Utils.setMediaList(videoAlbumList);
+            recyclerView = findViewById(R.id.recyclerVideoAlbum);
             VideoAlbumAdapter adapter = new VideoAlbumAdapter(videoAlbumList);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
@@ -271,7 +273,6 @@ public class Video1 extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(context,Video2.class);
-                        intent.putExtra("key_list", VideoList);
                         intent.putExtra("key_pos", holder.getAdapterPosition());
                         startActivity(intent);
                         overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);

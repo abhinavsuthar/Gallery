@@ -2,6 +2,8 @@ package com.developer.abhinav_suthar.gallery;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +25,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.developer.abhinav_suthar.gallery.extras.BackgroundVideoPlay;
+import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,10 +49,10 @@ import java.util.TimerTask;
 public class Video2 extends AppCompatActivity{
 
     private VideoView videoView;
-    private FrameLayout layout;
-    boolean backPlay = true, autoPlay = true;
+    private boolean backPlay = false, autoPlay = true;
     private ArrayList<HashMap<String,String>> videoList;
-    private int p, seekTo=0;
+    private int p;
+    private static int seekTo=0;
     private MediaPlayer mp;
     private AudioManager am;
     private Timer vdCurrTime, t = new Timer();
@@ -104,16 +108,15 @@ public class Video2 extends AppCompatActivity{
             }
         }else if("notificationVideoAction".equals(getIntent().getAction())){
             p = getIntent().getIntExtra("key_position",0);
-            videoList = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("key_list");
+            videoList = Utils.getMediaList();
         }else {
-            videoList = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("key_list");
+            videoList = Utils.getMediaList();
             p = getIntent().getIntExtra("key_pos", 0);
             seekTo=0;
         }
 
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         videoView = findViewById(R.id.videoView);
-        layout = findViewById(R.id.video_2_layout);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         autoPlay = sp.getBoolean("key_autoPlay", true);
@@ -142,10 +145,10 @@ public class Video2 extends AppCompatActivity{
                 mp =  mediaPlayer;
                 int result = am.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
-                    mediaPlayer.start();
-                    mediaPlayer.seekTo(seekTo);
                     seekTo=0;
                     fixVideoOrientation();
+                    mediaPlayer.start();
+                    mediaPlayer.seekTo(seekTo);
                     mediaController();
                 } else Toast.makeText(Video2.this, "Another application is using audio", Toast.LENGTH_SHORT).show();
             }
@@ -181,18 +184,20 @@ public class Video2 extends AppCompatActivity{
                 return true;
             }
         });
-        layout.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void mediaController(){
+
+        findViewById(R.id.video_2_layout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 hideShowMediaController();
             }
         });
-    }
-
-    private void mediaController(){
 
         try {
             vdCurrTime.cancel();
+            vdCurrTime=null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -346,7 +351,7 @@ public class Video2 extends AppCompatActivity{
                         }
                     });
 
-            t.cancel();
+            t.cancel();t=null;
             t = new Timer();
         }else {
             top.setVisibility(View.VISIBLE);
@@ -381,8 +386,7 @@ public class Video2 extends AppCompatActivity{
         findViewById(R.id.v2imgBackButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Video2.super.onBackPressed();
-                overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
+                onBackPressed();
             }
         });
         findViewById(R.id.v2imgBackgroundPlay).setOnClickListener(new View.OnClickListener() {
@@ -390,18 +394,14 @@ public class Video2 extends AppCompatActivity{
             public void onClick(View v) {
                 stopService(new Intent(Video2.this, BackgroundVideoPlay.class));
                 Intent intent = new Intent(Video2.this, BackgroundVideoPlay.class);
-                intent.putExtra("video_list", videoList);
                 intent.putExtra("video_number",p);
                 intent.putExtra("video_position", videoView.getCurrentPosition());
                 startService(intent);
                 backPlay = false;
-                try {
-                    videoView.pause();
-                    am.abandonAudioFocus(listener);
-                    unregisterReceiver(handler);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+
+                am.abandonAudioFocus(listener);
+                unregisterReceiver(handler);
+
                 Video2.super.onBackPressed();
                 overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
             }
@@ -441,9 +441,22 @@ public class Video2 extends AppCompatActivity{
             params.width  = ViewGroup.LayoutParams.MATCH_PARENT;
             params.height = (int) ((float) width2 / videoProportion);
             videoView.setLayoutParams(params);
-            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                videoView.setForegroundGravity(Gravity.CENTER);
-            }*/
+
+            /*ValueAnimator anim = ValueAnimator.ofInt(videoView.getMeasuredHeight(), (int) ((float) width2 / videoProportion))
+                    .setDuration(1500);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    int val = (Integer) valueAnimator.getAnimatedValue();
+                    ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
+                    layoutParams.height = val;
+                    videoView.setLayoutParams(layoutParams);
+                }
+            });
+            AnimatorSet set = new AnimatorSet();
+            set.play(anim);
+            set.setInterpolator(new AccelerateDecelerateInterpolator());
+            set.start();*/
 
         }else {
 
@@ -451,50 +464,50 @@ public class Video2 extends AppCompatActivity{
             params.width  = (int) (videoProportion * (float) height2);
             params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             videoView.setLayoutParams(params);
-            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                videoView.setForegroundGravity(Gravity.CENTER);
-            }*/
         }
     }
 
     @Override
     public void onBackPressed() {
         if (backPlay&&videoView.isPlaying()){
+            Utils.setMediaList(videoList);
             stopService(new Intent(Video2.this, BackgroundVideoPlay.class));
             Intent intent = new Intent(Video2.this, BackgroundVideoPlay.class);
-            intent.putExtra("video_list", videoList);
             intent.putExtra("video_number",p);
             intent.putExtra("video_position", videoView.getCurrentPosition());
             startService(intent);
             backPlay = false;
         }
         try {
-            videoView.pause();
-            am.abandonAudioFocus(listener);
             unregisterReceiver(handler);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        am.abandonAudioFocus(listener);
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
     }
 
     @Override
     protected void onStop() {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         boolean mpPlaying = false;
         try {
             mpPlaying = mp.isPlaying();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if ((!sp.getBoolean("key_offScreen", false)) && mpPlaying) mp.pause();
+        if ((!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("key_offScreen", false)) && mpPlaying) mp.pause();
         super.onStop();
     }
 
     @Override
     protected void onPause() {
-        vdCurrTime.cancel();
+        try {
+            vdCurrTime.cancel();
+            t.cancel();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onPause();
     }
 

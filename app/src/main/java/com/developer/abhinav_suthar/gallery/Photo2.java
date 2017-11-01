@@ -81,10 +81,9 @@ public class Photo2 extends AppCompatActivity {
         context = this;
         activity = (Photo2) context;
 
-        imageList = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("key_list");
-        Integer position = getIntent().getIntExtra("key_position",0);
+        imageList = Utils.getMediaList();
 
-        loadPhoto(position);
+        loadPhoto(getIntent().getIntExtra("key_position",0));
         photoControls();
 
     }
@@ -94,7 +93,7 @@ public class Photo2 extends AppCompatActivity {
         FullScreenImageAdapter adapter = new FullScreenImageAdapter(activity);
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(adapter);
         mViewPager.setCurrentItem(position);
         mViewPager.setPageMargin(dp2Pixels(context, 10));
@@ -124,8 +123,8 @@ public class Photo2 extends AppCompatActivity {
     }
 
     private void showImageDateTime(int position){
-        TextView date = (TextView) findViewById(R.id.txtImgDate);
-        TextView time = (TextView) findViewById(R.id.txtImgTime);
+        TextView date = findViewById(R.id.txtImgDate);
+        TextView time = findViewById(R.id.txtImgTime);
         long millis = Long.parseLong(imageList.get(position).get("key_timestamp"))*1000L;
         Date d = new Date(millis);
         DateFormat df=new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
@@ -137,10 +136,10 @@ public class Photo2 extends AppCompatActivity {
 
     private void photoControls(){
 
-        ImageView back   = (ImageView) findViewById(R.id.imgBackButton);
-        ImageView share  = (ImageView) findViewById(R.id.p2ImgShare);
-        ImageView delete = (ImageView) findViewById(R.id.p2ImgDelete);
-        ImageView more   = (ImageView) findViewById(R.id.p2ImgMore);
+        ImageView back   = findViewById(R.id.imgBackButton);
+        ImageView share  = findViewById(R.id.p2ImgShare);
+        ImageView delete = findViewById(R.id.p2ImgDelete);
+        ImageView more   = findViewById(R.id.p2ImgMore);
 
         //Back
         back.setOnClickListener(new View.OnClickListener() {
@@ -172,8 +171,8 @@ public class Photo2 extends AppCompatActivity {
                 final BottomSheetDialog deleteDialog = new BottomSheetDialog(Photo2.this);
                 deleteDialog.setContentView(R.layout.bottom_delete_dialog);
                 deleteDialog.show();
-                Button cancel = (Button) deleteDialog.findViewById(R.id.deleteDialogCancel);
-                Button delete = (Button) deleteDialog.findViewById(R.id.deleteDialogDelete);
+                Button cancel = deleteDialog.findViewById(R.id.deleteDialogCancel);
+                Button delete = deleteDialog.findViewById(R.id.deleteDialogDelete);
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {deleteDialog.dismiss();
@@ -568,6 +567,7 @@ public class Photo2 extends AppCompatActivity {
             SubsamplingScaleImageView imgDisplay = viewLayout.findViewById(R.id.imagePreview);
 
             imgDisplay.setImage(ImageSource.uri((imageList.get(position).get("key_path"))));
+            
             imgDisplay.setMinimumTileDpi(100);
             imgDisplay.setOnClickListener(new View.OnClickListener() {
                 @Override

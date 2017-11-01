@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -58,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
         setContentView(R.layout.activity_main);
 
         loadAlbum();
@@ -67,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -82,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if (position==1) pageNumber = 1;
-                else pageNumber = 0;
+                pageNumber = position;
             }
 
             @Override
@@ -280,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.viewPhotos);
+            final RecyclerView recyclerView = findViewById(R.id.viewPhotos);
             PhotosAdapter adapter = new PhotosAdapter(AlbumList);
 
             GridLayoutManager layoutManager;
@@ -330,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
             Glide.with(context)
                     .load(new File(photoAlbumDetail.get("key_path")))
-                    .override(200, 200)
+                    //.override(200, 200)
                     .centerCrop()
                     .into(holder.albumImage);
             holder.albumTitle.setText(photoAlbumDetail.get("key_album"));

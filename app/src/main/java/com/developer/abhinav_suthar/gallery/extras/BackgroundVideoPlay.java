@@ -63,7 +63,7 @@ public class BackgroundVideoPlay extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        videoList = (ArrayList<HashMap<String,String>>) intent.getSerializableExtra("video_list");
+        videoList = Utils.getMediaList();
         p = intent.getIntExtra("video_number",0);
         videoPos = intent.getIntExtra("video_position",0);
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
