@@ -1,8 +1,6 @@
 <resources>
-    <string name="app_name">Smart Gallery</string>
+    <string name="app_name">Gallery</string>
 
-    <string name="banner_ad_unit_id">ca-app-pub-8656290775789159/5555620530</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-8656290775789159/5612418715</string>
-    <string name="rewarded_video_ad_unit_id">ca-app-pub-8656290775789159/9925878873</string>
+    <string name="about_tool_1">"Tool 1: From this tool you can text to whatsapp contact without saving his/her number. Just enter his/her whatsapp number with country code."</string>
 
 </resources>

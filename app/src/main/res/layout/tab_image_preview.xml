@@ -5,6 +5,12 @@
     tools:context="com.developer.abhinav_suthar.gallery.Photo2">
 
 
+    <ImageView
+        android:id="@+id/imagePreview2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"/>
+
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/imagePreview"
         android:layout_width="match_parent"

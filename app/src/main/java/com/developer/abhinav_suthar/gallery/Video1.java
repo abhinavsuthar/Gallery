@@ -42,9 +42,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,24 +82,10 @@ public class Video1 extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         loadVideoList();
-        loadBannerAd();
-    }
-
-    private void loadBannerAd(){
-        final AdView mAdView = (AdView) findViewById(R.id.adView11);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
     private void loadVideoList(){
         LoadVideoAlbum videoAlbum = new LoadVideoAlbum();
-        //videoAlbum.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,"");
         videoAlbum.execute(albumName);
     }
 
@@ -350,8 +333,8 @@ public class Video1 extends AppCompatActivity {
             MenuItem copy = menu.findItem(R.id.selection_copy);
 
             if (numOfSelectedItem!=VideoList.size())
-                selectAll.setIcon(android.R.drawable.checkbox_on_background);
-            else selectAll.setIcon(android.R.drawable.checkbox_off_background);
+                selectAll.setIcon(R.drawable.select_all_icon);
+            else selectAll.setIcon(R.drawable.select_none_icon);
 
             selectAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -360,13 +343,13 @@ public class Video1 extends AppCompatActivity {
                         for (int i=0; i<VideoList.size();i++) itemSelectionMode[i] = false;
                         numOfSelectedItem = 0;
                         getSupportActionBar().setTitle(""+numOfSelectedItem);
-                        selectAll.setIcon(android.R.drawable.checkbox_on_background);
+                        selectAll.setIcon(R.drawable.select_all_icon);
                         notifyDataSetChanged();
                     }else {
                         for (int i=0; i<VideoList.size();i++) itemSelectionMode[i] = true;
                         numOfSelectedItem = VideoList.size();
                         getSupportActionBar().setTitle(""+numOfSelectedItem);
-                        selectAll.setIcon(android.R.drawable.checkbox_off_background);
+                        selectAll.setIcon(R.drawable.select_none_icon);
                         notifyDataSetChanged();
                     }
                     return true;
@@ -470,7 +453,7 @@ public class Video1 extends AppCompatActivity {
                     final BottomSheetDialog copyDialog = new BottomSheetDialog(Video1.this);
                     copyDialog.setContentView(R.layout.bottom_more_dialog);
                     copyDialog.show();
-                    ListView listView = (ListView) copyDialog.findViewById(R.id.p2MoreListView);
+                    ListView listView = copyDialog.findViewById(R.id.p2MoreListView);
                     ArrayAdapter<String> adapter=new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, AlbumNames);
                     listView.setAdapter(adapter);
 

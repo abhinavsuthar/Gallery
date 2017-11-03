@@ -9,7 +9,8 @@
         app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
         android:title="Sort by"
-        app:showAsAction="never">
+        android:icon="@drawable/sort_icon"
+        app:showAsAction="always">
         <menu>
             <group android:checkableBehavior="all">
                 <item

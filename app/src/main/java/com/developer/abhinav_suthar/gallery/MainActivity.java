@@ -36,9 +36,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -47,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -93,19 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadBannerAd();
-                    }
-                });
-            }
-        }, 1000);
     }
 
     private void loadAlbum(){
@@ -115,18 +97,6 @@ public class MainActivity extends AppCompatActivity {
             LoadVideoList loadVideoList = new LoadVideoList();
             loadVideoList.execute();
         }else ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-    }
-
-    private void loadBannerAd(){
-        final AdView mAdView = (AdView) findViewById(R.id.adView00);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
     @Override
@@ -273,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
             if (cursorExternal != null) cursorExternal.close();
             if (cursorInternal != null) cursorInternal.close();
             cursor.close();
-            //Collections.sort(imageList, imageList.get().get("key_timestamp"));
-            //Collections.sort(albumList, new MapComparator(Function.KEY_TIMESTAMP, "dsc")); // Arranging photo album by timestamp decending
             return "Abhi";
         }
 
@@ -293,13 +261,10 @@ public class MainActivity extends AppCompatActivity {
                 layoutManager = new GridLayoutManager(context, 5);
             }
 
-            try {
+            if(recyclerView!=null){
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setAdapter(adapter);
-            } catch (Exception e) {
-                e.printStackTrace();
-                recreate();
             }
 
             Utils.ImageAlbumDetails(AlbumList);
@@ -422,20 +387,16 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.viewVideos);
+            final RecyclerView recyclerView = findViewById(R.id.viewVideos);
             VideoAdapter adapter = new VideoAdapter(VideoList);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
 
-            try {
+            if(recyclerView!=null){
                 recyclerView.setHasFixedSize(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-                recreate();
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setAdapter(adapter);
             }
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-
             Utils.VideoAlbumDetails(VideoList);
         }
     }

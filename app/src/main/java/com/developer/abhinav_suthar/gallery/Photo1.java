@@ -1,6 +1,5 @@
 package com.developer.abhinav_suthar.gallery;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,12 +15,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,14 +35,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,7 +56,6 @@ public class Photo1 extends AppCompatActivity {
     public Context context;
     private String albumName;
     private int photoPosition = 0;
-    private int pagerPosition = 0;
     private RecyclerView recyclerView;
     private ArrayList<HashMap<String, String>> imageList = new ArrayList<>();
     private Menu menu;
@@ -77,6 +66,8 @@ public class Photo1 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_1);
 
+        recyclerView = findViewById(R.id.photo_1_recyclerView);
+
         albumName = getIntent().getExtras().getString("key_album");
 
         context = this;
@@ -86,98 +77,12 @@ public class Photo1 extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        //LoadAlbum loadAlbum = new LoadAlbum();
-        //loadAlbum.execute(albumName);
-        loadPhoto(1);
-        //loadBannerAd();
-
-        recyclerView = findViewById(R.id.viewPhotos);
-    }
-
-    private void loadBannerAd(){
-        final AdView mAdView = findViewById(R.id.adView01);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void loadPhoto(int position){
-
-        // Set up the ViewPager with the sections adapter.
-        ViewPager mViewPager = findViewById(R.id.photo_1_viewPager);
-        mViewPager.setAdapter(new FullScreenImageAdapter());
-        //mViewPager.setCurrentItem(0);
-        //mViewPager.setPageMargin(dp2Pixels(context, 10));
-        //mViewPager.setOffscreenPageLimit(0);
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                pagerPosition = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-
-    }
-
-    /**
-     * ViewPager Adapter
-     */
-    private class FullScreenImageAdapter extends PagerAdapter {
-
         LoadAlbum loadAlbum = new LoadAlbum();
-
-        @Override
-        public int getCount() {
-            return Utils.getImageAlbumNames().size()-1;
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == (object);
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Toast.makeText(context, "ViewPagerPosition"+pagerPosition, Toast.LENGTH_SHORT).show();
-
-            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View viewLayout = inflater.inflate(R.layout.tab1_photos, container, false);
-
-            recyclerView = findViewById(R.id.viewPhotos);
-
-            loadAlbum.execute(Utils.getImageAlbumNames().get(position));
-
-            (container).addView(viewLayout);
-
-            return viewLayout;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            (container).removeView((RelativeLayout) object);
-
-        }
-
+        loadAlbum.execute(albumName);
     }
+
 
     private class LoadAlbum extends AsyncTask<String, Void, String> {
-
-        //String albumName;
 
         @Override
         protected void onPreExecute() {
@@ -189,14 +94,14 @@ public class Photo1 extends AppCompatActivity {
         protected String doInBackground(String... strings) {
 
             String albumName = strings[0];
-            String path, path2, size, height, width, displayName, timestamp;
+            String path, mime, size, height, width, displayName, timestamp;
 
             Uri uriExternal = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Uri uriInternal = android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI;
 
             String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.SIZE,
                     MediaStore.MediaColumns.HEIGHT, MediaStore.MediaColumns.WIDTH, MediaStore.MediaColumns.DISPLAY_NAME,
-                    MediaStore.Images.Thumbnails.DATA};
+                    MediaStore.Images.ImageColumns.MIME_TYPE};
             Cursor cursorExternal = getContentResolver().query(uriExternal, projection, "bucket_display_name = \"" + albumName + "\"", null, null);
             Cursor cursorInternal = getContentResolver().query(uriInternal, projection, "bucket_display_name = \"" + albumName + "\"", null, null);
             Cursor cursor = new MergeCursor(new Cursor[]{cursorExternal, cursorInternal});
@@ -204,15 +109,15 @@ public class Photo1 extends AppCompatActivity {
             while (cursor.moveToNext()) {
 
                 path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA));
-                path2 = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails.DATA));
                 timestamp = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED));
                 size = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE));
                 height = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.HEIGHT));
                 width = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.WIDTH));
                 displayName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME));
+                mime = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.MIME_TYPE));
                 HashMap<String, String> temp = new HashMap<>();
                 temp.put("key_path", path);
-                temp.put("key_path2", path2);
+                temp.put("key_mime", mime);
                 temp.put("key_timestamp", timestamp);
                 temp.put("key_size", size);
                 temp.put("key_height", height);
@@ -235,9 +140,8 @@ public class Photo1 extends AppCompatActivity {
 
             if (imageList.size() == 0) finish();
             Utils.setMediaList(imageList);
-            Toast.makeText(context, "ImageList"+imageList.size(), Toast.LENGTH_SHORT).show();
 
-            recyclerView = findViewById(R.id.viewPhotos);
+            recyclerView = findViewById(R.id.photo_1_recyclerView);
             PhotoAdapter adapter = new PhotoAdapter(imageList);
 
             GridLayoutManager layoutManager;
@@ -285,7 +189,7 @@ public class Photo1 extends AppCompatActivity {
         public void onBindViewHolder(final PhotoAdapter.MyViewHolder holder, int position) {
 
             Glide.with(context)
-                    .load(new File(albumList.get(position).get("key_path2")))
+                    .load(new File(albumList.get(position).get("key_path")))
                     .into(holder.albumImage);
 
             if (showCheckBox) {
@@ -356,8 +260,8 @@ public class Photo1 extends AppCompatActivity {
             MenuItem copy = menu.findItem(R.id.selection_copy);
             MenuItem close = menu.findItem(R.id.selection_close);
             if (numOfSelectedItem!=imageList.size())
-                selectAll.setIcon(android.R.drawable.checkbox_on_background);
-            else selectAll.setIcon(android.R.drawable.checkbox_off_background);
+                selectAll.setIcon(R.drawable.select_all_icon);
+            else selectAll.setIcon(R.drawable.select_none_icon);
 
             selectAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -366,13 +270,13 @@ public class Photo1 extends AppCompatActivity {
                         for (int i=0; i<imageList.size();i++) itemSelectionMode[i] = false;
                         numOfSelectedItem = 0;
                         getSupportActionBar().setTitle(""+numOfSelectedItem);
-                        selectAll.setIcon(android.R.drawable.checkbox_on_background);
+                        selectAll.setIcon(R.drawable.select_all_icon);
                         notifyDataSetChanged();
                     }else {
                         for (int i=0; i<imageList.size();i++) itemSelectionMode[i] = true;
                         numOfSelectedItem = imageList.size();
                         getSupportActionBar().setTitle(""+numOfSelectedItem);
-                        selectAll.setIcon(android.R.drawable.checkbox_off_background);
+                        selectAll.setIcon(R.drawable.select_none_icon);
                         notifyDataSetChanged();
                     }
                     return true;

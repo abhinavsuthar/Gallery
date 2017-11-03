@@ -11,20 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import android.widget.TextView;
 
 public class About extends AppCompatActivity {
-
-    private RewardedVideoAd mAd;
-    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +25,15 @@ public class About extends AppCompatActivity {
         getSupportActionBar().setTitle("About");
 
         functions();
-        loadBannerAd();
-        loadInterstitialAd();
-        loadRewardedVideo();
     }
 
     private void functions(){
 
-        CardView feedback = (CardView) findViewById(R.id.about_feedback);
-        CardView improve = (CardView) findViewById(R.id.about_improve);
-        CardView aboutMe = (CardView) findViewById(R.id.about_about_me);
-        CardView supportMe = (CardView) findViewById(R.id.about_support_me);
-        ImageView call = (ImageView) findViewById(R.id.about_callMe);
-        ImageView whatsApp = (ImageView) findViewById(R.id.about_whatsAppMe);
+        CardView feedback = findViewById(R.id.about_feedback);
+        CardView improve = findViewById(R.id.about_improve);
+        CardView aboutMe = findViewById(R.id.about_about_me);
+        ImageView call = findViewById(R.id.about_callMe);
+        ImageView whatsApp = findViewById(R.id.about_whatsAppMe);
 
         feedback.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +42,6 @@ public class About extends AppCompatActivity {
                 mail.putExtra(Intent.EXTRA_EMAIL, new String[]{"abhinav.suthar.50@gmail.com"});
                 mail.putExtra(Intent.EXTRA_SUBJECT, "Gallery App FeedBack");
                 mail.putExtra(Intent.EXTRA_TEXT, "Hi Abhinav\nI will tell you something about your app.\n");
-                //mail.setType("message/rfc822");
                 mail.setData(Uri.parse("mailto:abhinav.suthar.50@gmail.com"));
                 startActivity(Intent.createChooser(mail, "Send with Gmail"));
             }
@@ -69,7 +53,6 @@ public class About extends AppCompatActivity {
                 mail.putExtra(Intent.EXTRA_EMAIL, new String[]{"abhinav.suthar.50@gmail.com"});
                 mail.putExtra(Intent.EXTRA_SUBJECT, "Gallery App Suggestion");
                 mail.putExtra(Intent.EXTRA_TEXT, "Hi Abhinav\nHere is my suggestion/improvement\n");
-                //mail.setType("message/rfc822");
                 mail.setData(Uri.parse("mailto:abhinav.suthar.50@gmail.com"));
                 startActivity(Intent.createChooser(mail, "Send with Gmail"));
             }
@@ -92,22 +75,6 @@ public class About extends AppCompatActivity {
                 dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             }
         });
-        supportMe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mAd.isLoaded()) mAd.show();
-                else if (mInterstitialAd.isLoaded()){
-                    mInterstitialAd.show();
-                    mInterstitialAd.setAdListener(new AdListener() {
-                        @Override
-                        public void onAdClosed() {
-                            loadInterstitialAd();
-                            super.onAdClosed();
-                        }
-                    });
-                }
-            }
-        });
         call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,107 +87,22 @@ public class About extends AppCompatActivity {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=917240505099")));
             }
         });
-    }
 
-    private void loadBannerAd(){
-        final AdView mAdView = (AdView) findViewById(R.id.adView20);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
+        findViewById(R.id.about_tool_whatsAppMe).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAdLoaded() {
-                mAdView.setVisibility(View.VISIBLE);
-            }
-        });
-        final AdView mAdView1 = (AdView) findViewById(R.id.adView21);
-        AdRequest adRequest1 = new AdRequest.Builder().build();
-        mAdView1.loadAd(adRequest1);
-        mAdView1.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView1.setVisibility(View.VISIBLE);
-            }
-        });
-        final AdView mAdView2 = (AdView) findViewById(R.id.adView22);
-        AdRequest adRequest2 = new AdRequest.Builder().build();
-        mAdView2.loadAd(adRequest2);
-        mAdView2.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView2.setVisibility(View.VISIBLE);
-            }
-        });
-        final AdView mAdView3 = (AdView) findViewById(R.id.adView23);
-        AdRequest adRequest3 = new AdRequest.Builder().build();
-        mAdView3.loadAd(adRequest3);
-        mAdView3.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                mAdView3.setVisibility(View.VISIBLE);
+            public void onClick(View v) {
+                TextView textView = findViewById(R.id.about_tool_whatsAppMe_num);
+                String s = "https://api.whatsapp.com/send?phone=" + textView.getText().toString();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(s)));
             }
         });
     }
 
-    private void loadInterstitialAd(){
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
-        //mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-    }
 
-    private void loadRewardedVideo(){
-        mAd = MobileAds.getRewardedVideoAdInstance(this);
-        mAd.loadAd(getString(R.string.rewarded_video_ad_unit_id), new AdRequest.Builder().build());
-        //mAd.loadAd("ca-app-pub-3940256099942544/5224354917", new AdRequest.Builder().build());
-        mAd.setRewardedVideoAdListener(new RewardedVideoAdListener() {
-            @Override
-            public void onRewardedVideoAdLoaded() {
-                findViewById(R.id.about_clickMe).setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onRewardedVideoAdOpened() {
-
-            }
-
-            @Override
-            public void onRewardedVideoStarted() {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdClosed() {
-                findViewById(R.id.about_clickMe).setVisibility(View.GONE);
-                loadRewardedVideo();
-            }
-
-            @Override
-            public void onRewarded(RewardItem rewardItem) {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdLeftApplication() {
-
-            }
-
-            @Override
-            public void onRewardedVideoAdFailedToLoad(int i) {
-
-            }
-        });
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mInterstitialAd.isLoaded()) mInterstitialAd.show();
-        super.onBackPressed();
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if ((item.getItemId())==(android.R.id.home)) {
-            if (mInterstitialAd.isLoaded()) mInterstitialAd.show();
             super.onBackPressed();
             return true;
         }

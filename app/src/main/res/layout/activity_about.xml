@@ -125,7 +125,54 @@
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="Tools :"
+            android:textSize="18sp"
+            android:textColor="#000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:text="@string/about_tool_1"/>
+
         <android.support.v7.widget.CardView
+            android:id="@+id/about_tool_1"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_margin="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/about_tool_whatsAppMe_num"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:hint="Enter the whatsApp number"
+                    android:ems="10"
+                    android:inputType="phone" />
+                <ImageView
+                    android:id="@+id/about_tool_whatsAppMe"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_gravity="center"
+                    android:padding="18dp"
+                    app:srcCompat="@drawable/whatsapp_icon" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!--z<android.support.v7.widget.CardView
             android:id="@+id/about_support_me"
             android:layout_width="match_parent"
             android:layout_height="70dp"
@@ -165,71 +212,7 @@
                     android:text="Click Me"
                     android:textColor="#0000FF"/>
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_margin="6dp"
-            android:visibility="gone">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </RelativeLayout>
-        </android.support.v7.widget.CardView>
-
-        <RelativeLayout
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:layout_gravity="bottom|end"
-            android:layout_marginTop="6dp">
-
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id"/>
-
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView21"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id"
-                android:layout_below="@+id/adView20"
-                android:layout_marginTop="8dp" />
-
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView22"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id"
-                android:layout_below="@+id/adView21"
-                android:layout_marginTop="8dp" />
-
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView23"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id"
-                android:layout_below="@+id/adView22"
-                android:layout_marginTop="8dp" />
-
-        </RelativeLayout>
+        </android.support.v7.widget.CardView>-->
 
     </LinearLayout>
 </ScrollView>

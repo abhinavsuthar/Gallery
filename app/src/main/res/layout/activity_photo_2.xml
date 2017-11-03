@@ -17,60 +17,70 @@
     <RelativeLayout
         android:id="@+id/p2TopLayout"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
         android:layout_gravity="top"
         android:background="#AA000000"
         android:visibility="visible">
 
-        <ImageView
-            android:id="@+id/imgBackButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="16dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            app:srcCompat="@drawable/back_arrow"
-            android:backgroundTint="#000" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_gravity="top"
+            android:background="#00000000"
+            android:visibility="visible"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtImgDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#FFF"
-            android:maxLines="1"
-            android:text="12 August, 2017"
-            android:layout_alignTop="@+id/imgBackButton"
-            android:layout_toEndOf="@+id/imgBackButton" />
+            <ImageView
+                android:id="@+id/imgBackButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:padding="16dp"
+                app:srcCompat="@drawable/back_arrow" />
 
-        <TextView
-            android:id="@+id/txtImgTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="12sp"
-            android:textColor="#FFF"
-            android:maxLines="1"
-            android:layout_below="@+id/txtImgDate"
-            android:layout_toEndOf="@+id/imgBackButton"
-            android:text="21:41" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/txtImgDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#FFF"
+                    android:maxLines="1"
+                    android:text="12 August, 2017"/>
 
-        <ImageView
-            android:id="@+id/imgStopSlideShow"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:visibility="gone"
-            android:padding="12dp"
-            android:tint="#FF0000"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+                <TextView
+                    android:id="@+id/txtImgTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FFF"
+                    android:maxLines="1"
+                    android:text="21:41" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imgStopSlideShow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:padding="14dp"
+                android:tint="#DD2546"
+                app:srcCompat="@drawable/cancel_icon" />
+        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/p2BottomLayout"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#AA000000"
         android:visibility="visible"
@@ -78,20 +88,6 @@
         android:clickable="true"
         app:layout_anchor="@id/container"
         app:layout_anchorGravity="bottom">
-
-        <ImageView
-            android:id="@+id/p2ImgDelete"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="31dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            app:srcCompat="@drawable/delete"
-            android:backgroundTint="#000"
-            android:foregroundTint="#000"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
 
         <ImageView
             android:id="@+id/p2ImgShare"
@@ -103,8 +99,34 @@
             android:paddingEnd="10dp"
             android:layout_alignParentTop="true"
             android:layout_marginEnd="12dp"
-            android:layout_toStartOf="@+id/p2ImgDelete"
+            android:layout_toStartOf="@+id/p2ImgSetAs"
             app:srcCompat="@drawable/share" />
+
+        <ImageView
+            android:id="@+id/p2ImgSetAs"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="31dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="12dp"
+            android:layout_toStartOf="@+id/p2ImgDelete"
+            app:srcCompat="@drawable/sort_icon" />
+
+        <ImageView
+            android:id="@+id/p2ImgDelete"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="31dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:srcCompat="@drawable/delete"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/dummy" />
+
 
         <ImageView
             android:id="@+id/p2ImgMore"
@@ -135,6 +157,19 @@
         <TextView
             android:layout_width="56dp"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/p2ImgSetAs"
+            android:layout_toStartOf="@+id/p2ImgSetAs"
+            android:layout_alignEnd="@+id/p2ImgSetAs"
+            android:layout_marginTop="-21dp"
+            android:text="Set As"
+            android:maxLines="1"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:textColor="#FFF" />
+
+        <TextView
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/p2ImgDelete"
             android:layout_toStartOf="@+id/p2ImgDelete"
             android:layout_alignEnd="@+id/p2ImgDelete"
@@ -157,6 +192,14 @@
             android:textSize="12sp"
             android:textAlignment="center"
             android:textColor="#FFF"/>
+
+        <!-- Empty layout (0x0 dp) centered horizontally -->
+        <Space
+            android:id="@+id/dummy"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible"/>
     </RelativeLayout>
 
 </FrameLayout>

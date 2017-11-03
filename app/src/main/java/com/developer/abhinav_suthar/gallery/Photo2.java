@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
@@ -29,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -39,6 +41,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
@@ -68,7 +71,7 @@ public class Photo2 extends AppCompatActivity {
     private ViewPager mViewPager;
     private ArrayList<HashMap<String, String>> imageList;
     private File outPutFile = null;
-    private final int cropImage = 0, cropWallpaper = 1, setAs = 2, editImage = 3;
+    private final int cropImage = 0, cropWallpaper = 1, setAs1 = 2, editImage = 3;
     private Timer t = new Timer(),timerSlideShow;
     private int reloadAlbum = 8;
     private int currentPhotoPosition = 0;
@@ -77,6 +80,8 @@ public class Photo2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_2);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         context = this;
         activity = (Photo2) context;
@@ -138,6 +143,7 @@ public class Photo2 extends AppCompatActivity {
 
         ImageView back   = findViewById(R.id.imgBackButton);
         ImageView share  = findViewById(R.id.p2ImgShare);
+        ImageView setAs = findViewById(R.id.p2ImgSetAs);
         ImageView delete = findViewById(R.id.p2ImgDelete);
         ImageView more   = findViewById(R.id.p2ImgMore);
 
@@ -161,6 +167,27 @@ public class Photo2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 shareImage(imageList.get(mViewPager.getCurrentItem()).get("key_path"));
+            }
+        });
+        //Set As
+        setAs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File f = new File(imageList.get(mViewPager.getCurrentItem()).get("key_path"));
+                //Convert to bitmap
+                Bitmap bmp = decodeFile(f);
+
+                try {
+                    Intent myIntent = new Intent();
+                    myIntent.setAction(Intent.ACTION_ATTACH_DATA);
+                    Uri imageUri = getImageUri(context, bmp);
+                    myIntent.setDataAndType(imageUri, "image/jpg");
+                    myIntent.putExtra("file_path", imageUri);
+                    startActivityForResult(myIntent, setAs1);
+
+                } catch (ActivityNotFoundException anfe) {
+                    Toast.makeText(context, "Error :Firing Intent to set image as contact failed.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         //Delete
@@ -211,7 +238,7 @@ public class Photo2 extends AppCompatActivity {
                 final BottomSheetDialog moreDialog = new BottomSheetDialog(Photo2.this);
                 moreDialog.setContentView(R.layout.bottom_more_dialog);
                 moreDialog.show();
-                ListView listView = (ListView) moreDialog.findViewById(R.id.p2MoreListView);
+                ListView listView = moreDialog.findViewById(R.id.p2MoreListView);
                 ArrayAdapter<String> adapter=new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, more);
                 listView.setAdapter(adapter);
 
@@ -246,7 +273,7 @@ public class Photo2 extends AppCompatActivity {
                             final BottomSheetDialog copyDialog = new BottomSheetDialog(Photo2.this);
                             copyDialog.setContentView(R.layout.bottom_more_dialog);
                             copyDialog.show();
-                            ListView listView = (ListView) copyDialog.findViewById(R.id.p2MoreListView);
+                            ListView listView = copyDialog.findViewById(R.id.p2MoreListView);
                             ArrayAdapter<String> adapter=new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, AlbumNames);
                             listView.setAdapter(adapter);
 
@@ -325,6 +352,7 @@ public class Photo2 extends AppCompatActivity {
                                 }
                             });
                         }else if (i==2){
+                            //Edit
                             moreDialog.dismiss();
                             Uri picUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() +
                                     ".com.developer.abhinav_suthar.gallery.provider", new File(imageList.get(mViewPager.getCurrentItem()).get("key_path")));
@@ -363,7 +391,7 @@ public class Photo2 extends AppCompatActivity {
                                 Uri imageUri = getImageUri(context, bmp);
                                 myIntent.setDataAndType(imageUri, "image/jpg");
                                 myIntent.putExtra("file_path", imageUri);
-                                startActivityForResult(myIntent, setAs);
+                                startActivityForResult(myIntent, setAs1);
 
                             } catch (ActivityNotFoundException anfe) {
                                 Toast.makeText(context, "Error :Firing Intent to set image as contact failed.", Toast.LENGTH_SHORT).show();
@@ -567,14 +595,20 @@ public class Photo2 extends AppCompatActivity {
             SubsamplingScaleImageView imgDisplay = viewLayout.findViewById(R.id.imagePreview);
 
             imgDisplay.setImage(ImageSource.uri((imageList.get(position).get("key_path"))));
-            
             imgDisplay.setMinimumTileDpi(100);
+            imgDisplay.setDoubleTapZoomScale(imgDisplay.getMaxScale()/2F);
+            imgDisplay.setMaxScale(5F);
             imgDisplay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleMenu();
                 }
             });
+
+            if (imageList.get(position).get("key_mime").contains("gif"))
+            Glide.with(context)
+                    .load(imageList.get(position).get("key_path"))
+                    .into((ImageView)viewLayout.findViewById(R.id.imagePreview2));
 
             (container).addView(viewLayout);
 
@@ -589,11 +623,13 @@ public class Photo2 extends AppCompatActivity {
     }
 
     public void toggleMenu(){
-        final RelativeLayout top    = (RelativeLayout) findViewById(R.id.p2TopLayout);
-        final RelativeLayout bottom = (RelativeLayout) findViewById(R.id.p2BottomLayout);
+        final RelativeLayout top    = findViewById(R.id.p2TopLayout);
+        final RelativeLayout bottom = findViewById(R.id.p2BottomLayout);
 
 
         if (top.getVisibility()==View.VISIBLE){
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
             top.setAlpha(1.0f);
             top.animate()
@@ -618,9 +654,14 @@ public class Photo2 extends AppCompatActivity {
                         }
                     });
 
+
             t.cancel();
             t = new Timer();
         }else {
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
             top.setVisibility(View.VISIBLE);
             bottom.setVisibility(View.VISIBLE);
 
@@ -719,7 +760,7 @@ public class Photo2 extends AppCompatActivity {
                     }
                 }
             }
-        }else if (requestCode==setAs){
+        }else if (requestCode==setAs1){
 
             if (resultCode==RESULT_OK) Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
             Uri uri = Utils.getTempImagePath();

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.Toast;
 
 import com.developer.abhinav_suthar.gallery.R;
 

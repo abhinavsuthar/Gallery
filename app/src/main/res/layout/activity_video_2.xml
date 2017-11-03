@@ -17,38 +17,45 @@
     <LinearLayout
         android:id="@+id/v2TopLayout"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
         android:layout_gravity="top"
         android:background="#AA000000"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:visibility="gone">
 
-        <ImageView
-            android:id="@+id/v2imgBackButton"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:padding="17dp"
-            app:srcCompat="@drawable/back_arrow"
-            android:backgroundTint="#000" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_gravity="top"
+            android:background="#00000000"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/v2txtVdName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#FFF"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:text="This is the video name" />
+            <ImageView
+                android:id="@+id/v2imgBackButton"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:padding="17dp"
+                app:srcCompat="@drawable/back_arrow" />
 
-        <ImageView
-            android:id="@+id/v2imgBackgroundPlay"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:padding="16dp"
-            app:srcCompat="@drawable/background" />
+            <TextView
+                android:id="@+id/v2txtVdName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#FFF"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:text="This is the video name" />
+
+            <ImageView
+                android:id="@+id/v2imgBackgroundPlay"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:padding="16dp"
+                app:srcCompat="@drawable/background" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -81,7 +88,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView android:id="@+id/v2time_current"
+            <TextView
+                android:id="@+id/v2time_current"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:paddingTop="4dip"
@@ -99,7 +107,8 @@
                 android:layout_weight="1"
                 android:layout_height="32dip" />
 
-            <TextView android:id="@+id/v2time"
+            <TextView
+                android:id="@+id/v2time"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:paddingTop="4dip"

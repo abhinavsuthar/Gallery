@@ -2,8 +2,6 @@ package com.developer.abhinav_suthar.gallery;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +16,7 @@ import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -25,8 +24,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.FrameLayout;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -145,11 +143,11 @@ public class Video2 extends AppCompatActivity{
                 mp =  mediaPlayer;
                 int result = am.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
-                    seekTo=0;
                     fixVideoOrientation();
-                    mediaPlayer.start();
                     mediaPlayer.seekTo(seekTo);
+                    seekTo=0;
                     mediaController();
+                    mediaPlayer.start();
                 } else Toast.makeText(Video2.this, "Another application is using audio", Toast.LENGTH_SHORT).show();
             }
         });
@@ -267,7 +265,6 @@ public class Video2 extends AppCompatActivity{
             }
         });
 
-
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -351,6 +348,8 @@ public class Video2 extends AppCompatActivity{
                         }
                     });
 
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
             t.cancel();t=null;
             t = new Timer();
         }else {
@@ -367,6 +366,9 @@ public class Video2 extends AppCompatActivity{
                     .translationYBy(-bottom.getHeight())
                     .alpha(1.0f)
                     .setListener(null);
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
             t.schedule(new TimerTask() {
                 @Override
@@ -489,25 +491,15 @@ public class Video2 extends AppCompatActivity{
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         boolean mpPlaying = false;
         try {
             mpPlaying = mp.isPlaying();
+            seekTo = mp.getCurrentPosition();
         } catch (Exception e) {
             e.printStackTrace();
         }
         if ((!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("key_offScreen", false)) && mpPlaying) mp.pause();
-        super.onStop();
-    }
-
-    @Override
-    protected void onPause() {
-        try {
-            vdCurrTime.cancel();
-            t.cancel();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         super.onPause();
     }
 
@@ -532,6 +524,7 @@ public class Video2 extends AppCompatActivity{
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)){
                 mp.pause();
+                am.abandonAudioFocus(listener);
             }
         }
     }

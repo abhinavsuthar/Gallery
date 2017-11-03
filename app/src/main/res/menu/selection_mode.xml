@@ -5,25 +5,26 @@
     <item
         android:id="@+id/selection_select_all"
         android:title="Select All"
-        android:icon="@android:drawable/checkbox_on_background"
+        android:icon="@drawable/select_all_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_share"
         android:title="Share"
-        android:icon="@android:drawable/ic_menu_share"
+        android:icon="@drawable/share_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_copy"
         android:title="Copy"
-        app:showAsAction="never"/>
+        android:icon="@drawable/copy_icon"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/selection_delete"
         android:title="Delete"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@drawable/delete_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_close"
         android:title="Close"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
-        app:showAsAction="always"/>
+        android:icon="@drawable/cancel_icon"
+        app:showAsAction="ifRoom"/>
 </menu>

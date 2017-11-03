@@ -128,7 +128,6 @@ public class BackgroundVideoPlay extends Service {
 
         Intent intent = new Intent(this, Video2.class);
         intent.setAction("notificationVideoAction");
-        intent.putExtra("key_list", videoList);
         intent.putExtra("key_position", p);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent playVideo = PendingIntent.getActivity(this,500,intent,PendingIntent.FLAG_UPDATE_CURRENT);
