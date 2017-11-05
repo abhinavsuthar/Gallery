@@ -36,6 +36,15 @@ public class Utils {
         Log.e("List Size", ""+mediaList.size());
         return mediaList; }
 
+    private static Boolean[] selectedMediaItems;
+    public static void setSelectedMediaItems(Boolean[] b){
+        selectedMediaItems = new Boolean[b.length];
+        selectedMediaItems = b;
+    }
+    public static Boolean[] getSelectedMediaItems(){
+        return selectedMediaItems;
+    }
+
     //Photos
     public static void ImageAlbumDetails(ArrayList<HashMap<String, String>> AlbumList){
         AlbumName.clear();

@@ -12,9 +12,11 @@ import android.database.MergeCursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,15 +31,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.developer.abhinav_suthar.gallery.extras.ServiceCopyDelete;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
@@ -142,7 +147,16 @@ public class Photo1 extends AppCompatActivity {
             Utils.setMediaList(imageList);
 
             recyclerView = findViewById(R.id.photo_1_recyclerView);
-            PhotoAdapter adapter = new PhotoAdapter(imageList);
+            GridView gridView = findViewById(R.id.photo_1_gridView);
+            int orientation = context.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                gridView.setNumColumns(4);
+            } else {
+                gridView.setNumColumns(7);
+            }
+            PhotoAdaptor2 adaptor2 = new PhotoAdaptor2();
+            gridView.setAdapter(adaptor2);
+            /*PhotoAdapter adapter = new PhotoAdapter(imageList);
 
             GridLayoutManager layoutManager;
             int orientation = context.getResources().getConfiguration().orientation;
@@ -155,7 +169,7 @@ public class Photo1 extends AppCompatActivity {
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
-            recyclerView.scrollToPosition(photoPosition);
+            recyclerView.scrollToPosition(photoPosition);*/
 
         }
     }
@@ -186,11 +200,15 @@ public class Photo1 extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final PhotoAdapter.MyViewHolder holder, int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
 
             Glide.with(context)
                     .load(new File(albumList.get(position).get("key_path")))
                     .into(holder.albumImage);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                holder.albumImage.setTransitionName("sharedElementTransition"+position);
+            }
 
             if (showCheckBox) {
                 holder.checkBox.setVisibility(View.VISIBLE);
@@ -213,11 +231,17 @@ public class Photo1 extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
+                        ImageView imageView = holder.albumImage;
+                        String transitionName = "None";
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                            transitionName = imageView.getTransitionName();
+                        }
+                        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Photo1.this, imageView, transitionName);
                         Intent intent = new Intent(context, Photo2.class);
                         intent.putExtra("key_position", holder.getAdapterPosition());
 
-                        startActivityForResult(intent, 501);
-                        overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
+                        startActivity(intent, options.toBundle());
+                        //overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
                     }
                 });
 
@@ -482,6 +506,347 @@ public class Photo1 extends AppCompatActivity {
                             }else {
                                 progressDialog.show();
                                 asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            }
+                        }
+                    });
+                    return true;
+                }
+            });
+
+            close.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    closeSelectionMode();
+                    return true;
+                }
+            });
+
+        }
+
+        private void closeSelectionMode(){
+            showCheckBox = false;
+            menu.clear();
+            getMenuInflater().inflate(R.menu.photo_1_menu, menu);
+            getSupportActionBar().setTitle(albumName);
+            notifyDataSetChanged();
+            for (int i=0; i<imageList.size();i++){
+                itemSelectionMode[i] = false;
+            }
+            numOfSelectedItem = 0;
+        }
+
+        private int copyFile(File sourceFile, File destFile, int TSC) throws IOException {
+            if (!sourceFile.exists()) {
+                Toast.makeText(context, "File already exist ! ! !", Toast.LENGTH_LONG).show();
+                return TSC;
+            }
+
+            FileChannel source = null;
+            FileChannel destination = null;
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            if (destination != null && source != null) {
+                destination.transferFrom(source, 0, source.size());
+            }
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+            scanFile(destFile.getAbsolutePath());
+            return ++TSC;
+        }
+
+        private void scanFile(String path){
+            MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.MediaScannerConnectionClient() {
+                @Override
+                public void onMediaScannerConnected() {
+
+                }
+
+                @Override
+                public void onScanCompleted(String s, Uri uri) {
+                    setResult(RESULT_OK);
+                }
+            });
+        }
+    }
+
+    private class PhotoAdaptor2 extends BaseAdapter{
+
+        private Boolean[] itemSelectionMode;
+        private boolean showCheckBox;
+        private int numOfSelectedItem = 0;
+
+        public PhotoAdaptor2(){
+            itemSelectionMode = new Boolean[imageList.size()];
+            for (int i=0; i<imageList.size();i++){
+                itemSelectionMode[i] = false;
+            }
+        }
+        @Override
+        public int getCount() {
+            return imageList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            LayoutInflater layoutInflater = LayoutInflater.from(Photo1.this);
+            if (convertView == null)convertView = layoutInflater.inflate(R.layout.photo_1, null);
+
+            final ImageView albumImage = convertView.findViewById(R.id.albumImage2);
+            final CheckBox checkBox   = convertView.findViewById(R.id.photo_1_checkBox);
+
+            Glide.with(context)
+                    .load(new File(imageList.get(position).get("key_path")))
+                    .into(albumImage);
+
+            final int pos = position;
+            if (showCheckBox) {
+                checkBox.setVisibility(View.VISIBLE);
+                checkBox.setChecked(itemSelectionMode[position]);
+                albumImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        itemSelectionMode[pos] = (!itemSelectionMode[pos]);
+                        checkBox.setChecked(itemSelectionMode[pos]);
+                        if (itemSelectionMode[pos]) numOfSelectedItem++;
+                        else numOfSelectedItem--;
+                        getSupportActionBar().setTitle(""+numOfSelectedItem);
+                        selectionModeFunctions();
+                    }
+                });
+            }else{
+                checkBox.setVisibility(View.GONE);
+
+                albumImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(context, Photo2.class);
+                        intent.putExtra("key_position", pos);
+
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
+                    }
+                });
+
+                albumImage.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        showCheckBox = true;
+                        numOfSelectedItem++;
+                        itemSelectionMode[pos] = (!itemSelectionMode[pos]);
+                        notifyDataSetChanged();
+                        menu.clear();
+                        getMenuInflater().inflate(R.menu.selection_mode, menu);
+                        getSupportActionBar().setTitle(""+numOfSelectedItem);
+                        selectionModeFunctions();
+                        return true;
+                    }
+                });
+            }
+
+            return convertView;
+        }
+
+        private void selectionModeFunctions(){
+            final MenuItem selectAll = menu.findItem(R.id.selection_select_all);
+            MenuItem share = menu.findItem(R.id.selection_share);
+            MenuItem delete = menu.findItem(R.id.selection_delete);
+            MenuItem copy = menu.findItem(R.id.selection_copy);
+            MenuItem close = menu.findItem(R.id.selection_close);
+            if (numOfSelectedItem!=imageList.size())
+                selectAll.setIcon(R.drawable.select_all_icon);
+            else selectAll.setIcon(R.drawable.select_none_icon);
+
+            selectAll.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    if (numOfSelectedItem==imageList.size()){
+                        for (int i=0; i<imageList.size();i++) itemSelectionMode[i] = false;
+                        numOfSelectedItem = 0;
+                        getSupportActionBar().setTitle(""+numOfSelectedItem);
+                        selectAll.setIcon(R.drawable.select_all_icon);
+                        notifyDataSetChanged();
+                    }else {
+                        for (int i=0; i<imageList.size();i++) itemSelectionMode[i] = true;
+                        numOfSelectedItem = imageList.size();
+                        getSupportActionBar().setTitle(""+numOfSelectedItem);
+                        selectAll.setIcon(R.drawable.select_none_icon);
+                        notifyDataSetChanged();
+                    }
+                    return true;
+                }
+            });
+
+            share.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    if (numOfSelectedItem<1) return false;
+                    ArrayList<Uri> imgUri = new ArrayList<>();
+                    for (int i=0;i<imageList.size();i++){
+                        if (itemSelectionMode[i]){
+                            imgUri.add(Uri.parse(imageList.get(i).get("key_path")));
+                        }
+                    }
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.");
+                    intent.setType("image/jpeg");
+                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imgUri);
+                    startActivity(intent);
+                    closeSelectionMode();
+                    return true;
+                }
+            });
+
+            delete.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    if (numOfSelectedItem<1) return false;
+                    final BottomSheetDialog deleteDialog = new BottomSheetDialog(Photo1.this);
+                    deleteDialog.setContentView(R.layout.bottom_delete_dialog);
+                    deleteDialog.show();
+                    Button cancel = (Button) deleteDialog.findViewById(R.id.deleteDialogCancel);
+                    Button delete = (Button) deleteDialog.findViewById(R.id.deleteDialogDelete);
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {deleteDialog.dismiss();
+                        }
+                    });
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            deleteDialog.dismiss();
+                            final ProgressDialog progressDialog = new ProgressDialog(context);
+                            progressDialog.setTitle("Processing...");
+                            progressDialog.setMessage("Please wait...");
+                            progressDialog.setCancelable(false);
+                            progressDialog.show();
+
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String[] imgPaths = new String[numOfSelectedItem];
+                                    for (int i=0,j=0;i<imageList.size();i++){
+                                        if (itemSelectionMode[i]){
+                                            imgPaths[j] = imageList.get(i).get("key_path");
+                                            j++;
+                                        }
+                                    }
+                                    for (String imgPath : imgPaths) {
+                                        totalSuccessfulCopy+=getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                MediaStore.Images.ImageColumns.DATA + "=?", new String[]{imgPath});
+
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                progressDialog.setMessage("Please wait... ("+totalSuccessfulCopy+"/"+numOfSelectedItem+")");
+                                            }
+                                        });
+                                    }
+                                    progressDialog.dismiss();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Load Album Again
+                                            imageList.clear();
+                                            LoadAlbum loadAlbum = new LoadAlbum();
+                                            loadAlbum.execute(albumName);
+                                            setResult(RESULT_OK);
+                                            closeSelectionMode();
+                                            Toast.makeText(context, ""+totalSuccessfulCopy+" File deleted successfully !", Toast.LENGTH_SHORT).show();
+                                            totalSuccessfulCopy = 0;
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    return true;
+                }
+            });
+            copy.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+
+                    final ArrayList<String>  AlbumNames = Utils.getImageAlbumNames();
+                    final ArrayList<String>  AlbumPaths = Utils.getImageAlbumPath();
+
+                    final BottomSheetDialog copyDialog = new BottomSheetDialog(Photo1.this);
+                    copyDialog.setContentView(R.layout.bottom_more_dialog);
+                    copyDialog.show();
+                    ListView listView = copyDialog.findViewById(R.id.p2MoreListView);
+                    ArrayAdapter<String> adapter=new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, AlbumNames);
+                    listView.setAdapter(adapter);
+
+
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+
+                            copyDialog.dismiss();
+                            Utils.setSelectedMediaItems(itemSelectionMode);
+
+                            if (i==(AlbumNames.size()-1)){
+                                //This block is called when user clicks make new folder
+                                //Get new folder name here using alert dialog
+                                final AlertDialog.Builder builder = new AlertDialog.Builder(Photo1.this);
+                                builder.setMessage("Enter folder name :");
+                                final EditText input = new EditText(Photo1.this);
+                                builder.setView(input);
+                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        String dirName = input.getText().toString();
+                                        File folder = new File(Environment.getExternalStorageDirectory(), dirName);
+                                        if (!folder.exists()) {
+                                            if (folder.mkdirs()){
+                                                AlbumPaths.add(folder.getAbsolutePath());
+                                                Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
+                                                copyService.setAction("copy");
+                                                copyService.putExtra("albumPosition", i);
+                                                startService(copyService);
+                                                //closeSelectionMode();
+                                            }
+                                        }else {int iii = 1;
+                                            while (folder.exists()){
+                                                String temp = dirName;
+                                                dirName = temp+" "+iii;
+                                                folder = new File(Environment.getExternalStorageDirectory(), dirName);
+                                                iii++;
+                                            }
+                                            if (folder.mkdirs()){
+                                                AlbumPaths.add(folder.getAbsolutePath());
+                                                Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
+                                                copyService.setAction("copy");
+                                                copyService.putExtra("albumPosition", i);
+                                                startService(copyService);
+                                                //closeSelectionMode();
+                                            }
+                                        }
+                                    }
+                                });
+                                builder.show();
+                            }else {
+                                Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
+                                copyService.setAction("copy");
+                                copyService.putExtra("albumPosition", i);
+                                startService(copyService);
+                                //closeSelectionMode();
                             }
                         }
                     });

@@ -605,6 +605,10 @@ public class Photo2 extends AppCompatActivity {
                 }
             });
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                imgDisplay.setTransitionName("sharedElementTransition"+position);
+            }
+
             if (imageList.get(position).get("key_mime").contains("gif"))
             Glide.with(context)
                     .load(imageList.get(position).get("key_path"))

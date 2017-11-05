@@ -26,6 +26,16 @@
         android:layout_height="match_parent"
         android:background="#FFFFFF"
         android:scrollbars="vertical"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <GridView
+        android:id="@+id/photo_1_gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="4"
+        android:horizontalSpacing="0.5dp"
+        android:verticalSpacing="0.5dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </android.support.design.widget.CoordinatorLayout>

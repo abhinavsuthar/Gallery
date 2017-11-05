@@ -63,6 +63,7 @@
             android:name="com.developer.abhinav_suthar.gallery.extras.BackgroundVideoPlay"
             android:enabled="true"
             android:exported="false"/>
+        <service android:name=".extras.ServiceCopyDelete" />
     </application>
 
 </manifest>
