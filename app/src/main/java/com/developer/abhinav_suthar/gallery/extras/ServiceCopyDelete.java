@@ -1,6 +1,9 @@
 package com.developer.abhinav_suthar.gallery.extras;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -8,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
+
+import com.developer.abhinav_suthar.gallery.R;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,39 +22,69 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by Abhinav_Suthar on 11/5/2017.
- */
-
 public class ServiceCopyDelete extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         String action = intent.getAction();
         if (action==null) action="None";
         if (action.equals("copy")){
             int albumPosition = intent.getIntExtra("albumPosition", 0);
+            int photoOrVideo = intent.getIntExtra("photoOrVideo", 1);
             Copy copy = new Copy();
-            copy.execute(albumPosition);
+            copy.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumPosition, photoOrVideo);
         }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private class Copy extends AsyncTask<Integer,Void,String>{
+    private class Copy extends AsyncTask<Integer,Integer,String>{
 
         int totalSuccessfulCopy = 0;
         int totalSelectedItems = 0;
+
+        Notification.Builder notificationBuilder;
+        NotificationManager notificationManager;
+        Notification notification;
+
+        @Override
+        protected void onPreExecute() {
+
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationBuilder = new Notification.Builder(getApplicationContext());
+            notificationBuilder
+                    //.setOngoing(true)
+                    .setSmallIcon(R.mipmap.launcher)
+                    .setContentTitle("Copying files...")
+                    .setContentText("Calculating..")
+                    .setProgress(100, 0, false);
+
+            //Send the notification:
+            notification = notificationBuilder.build();
+            notificationManager.notify(100, notification);
+            super.onPreExecute();
+        }
 
         @Override
         protected String doInBackground(Integer... s) {
 
             int i = s[0];
-            //int numOfSelectedItem = Integer.parseInt(s[1]);
+            ArrayList<String> AlbumPaths;
+            ArrayList<String> AlbumNames;
+            if (s[1]==0){
+                AlbumPaths = Utils.getImageAlbumPath();
+                AlbumNames = Utils.getImageAlbumNames();
+            }else {
+                AlbumPaths = Utils.getVideoAlbumPath();
+                AlbumNames = Utils.getVideoAlbumNames();
+            }
             ArrayList<HashMap<String, String>> imageList = Utils.getMediaList();
-            ArrayList<String> AlbumPaths = Utils.getImageAlbumPath();
-            ArrayList<String> AlbumNames = Utils.getImageAlbumNames();
             Boolean[] itemSelectionMode = Utils.getSelectedMediaItems();
-            totalSelectedItems = itemSelectionMode.length;
+            totalSelectedItems = 0;
+            for (int j=0;j<itemSelectionMode.length;j++){
+                if (itemSelectionMode[j]) totalSelectedItems++;
+            }
 
             for (int ii=0;ii<imageList.size();ii++){
                 if (itemSelectionMode[ii]){
@@ -68,17 +103,9 @@ public class ServiceCopyDelete extends Service {
                     }
                     try {
                         totalSuccessfulCopy = copyFile(f, new File(fileNewPath), totalSuccessfulCopy);
-                        /*runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.setMessage("Please wait... ("+totalSuccessfulCopy+"/"+numOfSelectedItem+")");
-                            }
-                        });*/
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
-                        return null;
-                    }
+                    }publishProgress(totalSuccessfulCopy);
                 }
             }
             if (i==(AlbumNames.size()-1)){
@@ -88,13 +115,20 @@ public class ServiceCopyDelete extends Service {
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Integer... values) {
+            //Update notification information:
+            notificationBuilder.setProgress(totalSelectedItems, values[0], false).setContentText(values[0]+"/"+totalSelectedItems);
+
+            //Send the notification:
+            notification = notificationBuilder.build();
+            notificationManager.notify(100, notification);
             super.onProgressUpdate(values);
         }
 
         @Override
         protected void onPostExecute(String s) {
             Toast.makeText(getApplicationContext(), s+" File copied successfully !", Toast.LENGTH_SHORT).show();
+            notificationManager.cancel(100);
             super.onPostExecute(s);
             stopSelf();
         }
@@ -135,11 +169,7 @@ public class ServiceCopyDelete extends Service {
                 }
             });
         }
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Nullable

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MergeCursor;
+import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.developer.abhinav_suthar.gallery.extras.ServiceCopyDelete;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
@@ -56,6 +58,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 
 public class Video1 extends AppCompatActivity {
@@ -171,6 +174,46 @@ public class Video1 extends AppCompatActivity {
         private boolean selectionMode = false;
         private Boolean[] itemSelectionMode;
         private int numOfSelectedItem = 0;
+        private String[] mColors = {
+                "FFEBEE", "FFCDD2", "EF9A9A", "E57373", "EF5350", "F44336", "E53935",        //reds
+                "D32F2F", "C62828", "B71C1C", "FF8A80", "FF5252", "FF1744", "D50000",
+                "FCE4EC", "F8BBD0", "F48FB1", "F06292", "EC407A", "E91E63", "D81B60",        //pinks
+                "C2185B", "AD1457", "880E4F", "FF80AB", "FF4081", "F50057", "C51162",
+                "F3E5F5", "E1BEE7", "CE93D8", "BA68C8", "AB47BC", "9C27B0", "8E24AA",        //purples
+                "7B1FA2", "6A1B9A", "4A148C", "EA80FC", "E040FB", "D500F9", "AA00FF",
+                "EDE7F6", "D1C4E9", "B39DDB", "9575CD", "7E57C2", "673AB7", "5E35B1",        //deep purples
+                "512DA8", "4527A0", "311B92", "B388FF", "7C4DFF", "651FFF", "6200EA",
+                "E8EAF6", "C5CAE9", "9FA8DA", "7986CB", "5C6BC0", "3F51B5", "3949AB",        //indigo
+                "303F9F", "283593", "1A237E", "8C9EFF", "536DFE", "3D5AFE", "304FFE",
+                "E3F2FD", "BBDEFB", "90CAF9", "64B5F6", "42A5F5", "2196F3", "1E88E5",        //blue
+                "1976D2", "1565C0", "0D47A1", "82B1FF", "448AFF", "2979FF", "2962FF",
+                "E1F5FE", "B3E5FC", "81D4fA", "4fC3F7", "29B6FC", "03A9F4", "039BE5",        //light blue
+                "0288D1", "0277BD", "01579B", "80D8FF", "40C4FF", "00B0FF", "0091EA",
+                "E0F7FA", "B2EBF2", "80DEEA", "4DD0E1", "26C6DA", "00BCD4", "00ACC1",        //cyan
+                "0097A7", "00838F", "006064", "84FFFF", "18FFFF", "00E5FF", "00B8D4",
+                "E0F2F1", "B2DFDB", "80CBC4", "4DB6AC", "26A69A", "009688", "00897B",        //teal
+                "00796B", "00695C", "004D40", "A7FFEB", "64FFDA", "1DE9B6", "00BFA5",
+                "E8F5E9", "C8E6C9", "A5D6A7", "81C784", "66BB6A", "4CAF50", "43A047",        //green
+                "388E3C", "2E7D32", "1B5E20", "B9F6CA", "69F0AE", "00E676", "00C853",
+                "F1F8E9", "DCEDC8", "C5E1A5", "AED581", "9CCC65", "8BC34A", "7CB342",        //light green
+                "689F38", "558B2F", "33691E", "CCFF90", "B2FF59", "76FF03", "64DD17",
+                "F9FBE7", "F0F4C3", "E6EE9C", "DCE775", "D4E157", "CDDC39", "C0CA33",        //lime
+                "A4B42B", "9E9D24", "827717", "F4FF81", "EEFF41", "C6FF00", "AEEA00",
+                "FFFDE7", "FFF9C4", "FFF590", "FFF176", "FFEE58", "FFEB3B", "FDD835",        //yellow
+                "FBC02D", "F9A825", "F57F17", "FFFF82", "FFFF00", "FFEA00", "FFD600",
+                "FFF8E1", "FFECB3", "FFE082", "FFD54F", "FFCA28", "FFC107", "FFB300",        //amber
+                "FFA000", "FF8F00", "FF6F00", "FFE57F", "FFD740", "FFC400", "FFAB00",
+                "FFF3E0", "FFE0B2", "FFCC80", "FFB74D", "FFA726", "FF9800", "FB8C00",        //orange
+                "F57C00", "EF6C00", "E65100", "FFD180", "FFAB40", "FF9100", "FF6D00",
+                "FBE9A7", "FFCCBC", "FFAB91", "FF8A65", "FF7043", "FF5722", "F4511E",        //deep orange
+                "E64A19", "D84315", "BF360C", "FF9E80", "FF6E40", "FF3D00", "DD2600",
+                "EFEBE9", "D7CCC8", "BCAAA4", "A1887F", "8D6E63", "795548", "6D4C41",        //brown
+                "5D4037", "4E342E", "3E2723",
+                "FAFAFA", "F5F5F5", "EEEEEE", "E0E0E0", "BDBDBD", "9E9E9E", "757575",        //grey
+                "616161", "424242", "212121",
+                "ECEFF1", "CFD8DC", "B0BBC5", "90A4AE", "78909C", "607D8B", "546E7A",        //blue grey
+                "455A64", "37474F", "263238"
+        };
 
         public VideoAlbumAdapter(ArrayList<HashMap<String, String>> VideoList){
             this.VideoList = VideoList;
@@ -183,6 +226,8 @@ public class Video1 extends AppCompatActivity {
         @Override
         public VideoAlbumAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.video_0, parent, false);
+
+            itemView.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
 
             return new MyViewHolder(itemView);
         }
@@ -258,7 +303,7 @@ public class Video1 extends AppCompatActivity {
                         Intent intent = new Intent(context,Video2.class);
                         intent.putExtra("key_pos", holder.getAdapterPosition());
                         startActivity(intent);
-                        overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
+                        overridePendingTransition(R.anim.slide_up_in, android.R.anim.fade_out);
                     }
                 });
 
@@ -290,6 +335,12 @@ public class Video1 extends AppCompatActivity {
                     startActivity(Intent.createChooser(intent, "Share video via..."));
                 }
             });
+
+            //holder.VdCardView.setCardBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
+            //holder.VdCardView.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
+            //holder.VdCardView.setDrawingCacheBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
+            //holder.VdShare.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
+            holder.VdCardView.setCardBackgroundColor(Color.RED);
 
         }
 
@@ -463,72 +514,9 @@ public class Video1 extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
 
                             //Dismiss the copy bottom dialog and initialize new progress dialog to
-                            //show progress of copied items
                             copyDialog.dismiss();
-                            final ProgressDialog progressDialog = new ProgressDialog(context);
-                            progressDialog.setTitle("Processing...");
-                            progressDialog.setMessage("Please wait... ("+totalSuccessfulCopy+"/"+numOfSelectedItem+")");
-                            progressDialog.setCancelable(false);
+                            Utils.setSelectedMediaItems(itemSelectionMode);
 
-                            //This is background task which copies files to given folder
-                            final AsyncTask asyncTask = new AsyncTask() {
-                                @Override
-                                protected Object doInBackground(Object[] params) {
-                                    for (int ii=0;ii<VideoList.size();ii++){
-                                        if (itemSelectionMode[ii]){
-                                            File f = new File(VideoList.get(ii).get("key_path"));
-                                            String name = f.getName();
-                                            int dot = name.lastIndexOf('.');
-                                            String base = (dot == -1) ? name : name.substring(0, dot);
-                                            String extension = (dot == -1) ? "" : name.substring(dot+1);
-
-                                            String fileNewPath = AlbumPaths.get(i) + "/" + base + "_Copy" + "." + extension;
-
-                                            int alreadyExist = 0;
-                                            while ((new File(fileNewPath).exists())){
-                                                fileNewPath = AlbumPaths.get(i) + "/" + base + "_Copy(" + alreadyExist + ")." + extension;
-                                                alreadyExist++;
-                                            }
-                                            try {
-                                                totalSuccessfulCopy = copyFile(f, new File(fileNewPath), totalSuccessfulCopy);
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        progressDialog.setMessage("Please wait... ("+totalSuccessfulCopy+"/"+numOfSelectedItem+")");
-                                                    }
-                                                });
-                                            } catch (final IOException e) {
-                                                e.printStackTrace();
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        Toast.makeText(context, "Failed :"+e.toString(), Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
-                                                return null;
-                                            }
-                                        }
-                                    }
-                                    try {
-                                        progressDialog.dismiss();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    setResult(RESULT_OK);
-                                    if (i==(AlbumNames.size()-1)){
-                                        AlbumPaths.remove((AlbumPaths.size()-1));
-                                    }
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            closeSelectionMode();
-                                            Toast.makeText(getApplicationContext(), ""+totalSuccessfulCopy+" File copied successfully !", Toast.LENGTH_SHORT).show();
-                                            totalSuccessfulCopy = 0;
-                                        }
-                                    });
-                                    return null;
-                                }
-                            };
 
                             if (i==(AlbumNames.size()-1)){
                                 //This block is called when user clicks make new folder
@@ -549,8 +537,11 @@ public class Video1 extends AppCompatActivity {
                                             if (folder.mkdirs()){
                                                 dialog.dismiss();
                                                 AlbumPaths.add(folder.getAbsolutePath());
-                                                progressDialog.show();
-                                                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                                Intent copyService = new Intent(Video1.this, ServiceCopyDelete.class);
+                                                copyService.setAction("copy");
+                                                copyService.putExtra("albumPosition", i);
+                                                startService(copyService);
+                                                closeSelectionMode();
                                             }
                                         }else {
                                             //Toast.makeText(getApplicationContext(), "Folder already exist!\nTry different name !", Toast.LENGTH_SHORT).show();
@@ -563,7 +554,11 @@ public class Video1 extends AppCompatActivity {
                                             if (folder.mkdirs()){
                                                 dialog.dismiss();
                                                 AlbumPaths.add(folder.getAbsolutePath());
-                                                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                                Intent copyService = new Intent(Video1.this, ServiceCopyDelete.class);
+                                                copyService.setAction("copy");
+                                                copyService.putExtra("albumPosition", i);
+                                                startService(copyService);
+                                                closeSelectionMode();
                                             }
                                         }
                                     }
@@ -571,8 +566,11 @@ public class Video1 extends AppCompatActivity {
 
                                 builder.show();
                             }else{
-                                progressDialog.show();
-                                asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                Intent copyService = new Intent(Video1.this, ServiceCopyDelete.class);
+                                copyService.setAction("copy");
+                                copyService.putExtra("albumPosition", i);
+                                startService(copyService);
+                                closeSelectionMode();
                             }
                         }
                     });

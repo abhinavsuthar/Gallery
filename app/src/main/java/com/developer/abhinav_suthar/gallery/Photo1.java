@@ -24,11 +24,13 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -69,6 +71,7 @@ public class Photo1 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_photo_1);
 
         recyclerView = findViewById(R.id.photo_1_recyclerView);
@@ -147,7 +150,7 @@ public class Photo1 extends AppCompatActivity {
             Utils.setMediaList(imageList);
 
             recyclerView = findViewById(R.id.photo_1_recyclerView);
-            GridView gridView = findViewById(R.id.photo_1_gridView);
+            gridView = findViewById(R.id.photo_1_gridView);
             int orientation = context.getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                 gridView.setNumColumns(4);
@@ -156,24 +159,11 @@ public class Photo1 extends AppCompatActivity {
             }
             PhotoAdaptor2 adaptor2 = new PhotoAdaptor2();
             gridView.setAdapter(adaptor2);
-            /*PhotoAdapter adapter = new PhotoAdapter(imageList);
-
-            GridLayoutManager layoutManager;
-            int orientation = context.getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                layoutManager = new GridLayoutManager(context, 4);
-            } else {
-                layoutManager = new GridLayoutManager(context, 7);
-            }
-
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-            recyclerView.scrollToPosition(photoPosition);*/
 
         }
     }
-
+    GridView gridView;
+    private boolean showCheckBox;
     private class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder>{
 
         private ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
@@ -231,17 +221,11 @@ public class Photo1 extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        ImageView imageView = holder.albumImage;
-                        String transitionName = "None";
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                            transitionName = imageView.getTransitionName();
-                        }
-                        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Photo1.this, imageView, transitionName);
                         Intent intent = new Intent(context, Photo2.class);
                         intent.putExtra("key_position", holder.getAdapterPosition());
 
-                        startActivity(intent, options.toBundle());
-                        //overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
+                        startActivityForResult(intent,501);
+                        overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
                     }
                 });
 
@@ -576,7 +560,6 @@ public class Photo1 extends AppCompatActivity {
     private class PhotoAdaptor2 extends BaseAdapter{
 
         private Boolean[] itemSelectionMode;
-        private boolean showCheckBox;
         private int numOfSelectedItem = 0;
 
         public PhotoAdaptor2(){
@@ -638,8 +621,8 @@ public class Photo1 extends AppCompatActivity {
                         Intent intent = new Intent(context, Photo2.class);
                         intent.putExtra("key_position", pos);
 
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.slide_up_in, R.anim.slide_up_out);
+                        startActivityForResult(intent, 501);
+                        overridePendingTransition(R.anim.slide_up_in, android.R.anim.fade_out);
                     }
                 });
 
@@ -660,6 +643,14 @@ public class Photo1 extends AppCompatActivity {
             }
 
             return convertView;
+        }
+
+        private void temp(){
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int width2  = displayMetrics.widthPixels;
+            int height2 = displayMetrics.heightPixels;
+            float screenProportion = (float) width2/(float) height2;
         }
 
         private void selectionModeFunctions(){
@@ -731,11 +722,11 @@ public class Photo1 extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {
                             deleteDialog.dismiss();
-                            final ProgressDialog progressDialog = new ProgressDialog(context);
+                            /*final ProgressDialog progressDialog = new ProgressDialog(context);
                             progressDialog.setTitle("Processing...");
                             progressDialog.setMessage("Please wait...");
                             progressDialog.setCancelable(false);
-                            progressDialog.show();
+                            progressDialog.show();*/
 
                             AsyncTask.execute(new Runnable() {
                                 @Override
@@ -751,14 +742,14 @@ public class Photo1 extends AppCompatActivity {
                                         totalSuccessfulCopy+=getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                                                 MediaStore.Images.ImageColumns.DATA + "=?", new String[]{imgPath});
 
-                                        runOnUiThread(new Runnable() {
+                                        /*runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
                                                 progressDialog.setMessage("Please wait... ("+totalSuccessfulCopy+"/"+numOfSelectedItem+")");
                                             }
-                                        });
+                                        });*/
                                     }
-                                    progressDialog.dismiss();
+                                    //progressDialog.dismiss();
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -819,8 +810,9 @@ public class Photo1 extends AppCompatActivity {
                                                 Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
                                                 copyService.setAction("copy");
                                                 copyService.putExtra("albumPosition", i);
+                                                copyService.putExtra("photoOrVideo", 0);
                                                 startService(copyService);
-                                                //closeSelectionMode();
+                                                closeSelectionMode();
                                             }
                                         }else {int iii = 1;
                                             while (folder.exists()){
@@ -834,8 +826,9 @@ public class Photo1 extends AppCompatActivity {
                                                 Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
                                                 copyService.setAction("copy");
                                                 copyService.putExtra("albumPosition", i);
+                                                copyService.putExtra("photoOrVideo", 0);
                                                 startService(copyService);
-                                                //closeSelectionMode();
+                                                closeSelectionMode();
                                             }
                                         }
                                     }
@@ -845,8 +838,9 @@ public class Photo1 extends AppCompatActivity {
                                 Intent copyService = new Intent(Photo1.this, ServiceCopyDelete.class);
                                 copyService.setAction("copy");
                                 copyService.putExtra("albumPosition", i);
+                                copyService.putExtra("photoOrVideo", 0);
                                 startService(copyService);
-                                //closeSelectionMode();
+                                closeSelectionMode();
                             }
                         }
                     });
@@ -864,7 +858,7 @@ public class Photo1 extends AppCompatActivity {
 
         }
 
-        private void closeSelectionMode(){
+        public void closeSelectionMode(){
             showCheckBox = false;
             menu.clear();
             getMenuInflater().inflate(R.menu.photo_1_menu, menu);
@@ -874,43 +868,6 @@ public class Photo1 extends AppCompatActivity {
                 itemSelectionMode[i] = false;
             }
             numOfSelectedItem = 0;
-        }
-
-        private int copyFile(File sourceFile, File destFile, int TSC) throws IOException {
-            if (!sourceFile.exists()) {
-                Toast.makeText(context, "File already exist ! ! !", Toast.LENGTH_LONG).show();
-                return TSC;
-            }
-
-            FileChannel source = null;
-            FileChannel destination = null;
-            source = new FileInputStream(sourceFile).getChannel();
-            destination = new FileOutputStream(destFile).getChannel();
-            if (destination != null && source != null) {
-                destination.transferFrom(source, 0, source.size());
-            }
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-            scanFile(destFile.getAbsolutePath());
-            return ++TSC;
-        }
-
-        private void scanFile(String path){
-            MediaScannerConnection.scanFile(context, new String[]{path}, null, new MediaScannerConnection.MediaScannerConnectionClient() {
-                @Override
-                public void onMediaScannerConnected() {
-
-                }
-
-                @Override
-                public void onScanCompleted(String s, Uri uri) {
-                    setResult(RESULT_OK);
-                }
-            });
         }
     }
 
@@ -1092,7 +1049,8 @@ public class Photo1 extends AppCompatActivity {
                     this.photoPosition = photoPosition;
                 }
                 try {
-                    recyclerView.scrollToPosition(photoPosition);
+                    gridView.smoothScrollToPosition(photoPosition);
+                    //recyclerView.scrollToPosition(photoPosition);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -1,6 +1,7 @@
 package com.developer.abhinav_suthar.gallery;
 
 import android.Manifest;
+import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -471,6 +473,5 @@ public class MainActivity extends AppCompatActivity {
         if (pageNumber==1) mViewPager.setCurrentItem(0);
         else super.onBackPressed();
     }
-
 }
 

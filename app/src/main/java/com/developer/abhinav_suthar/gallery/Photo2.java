@@ -151,15 +151,7 @@ public class Photo2 extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String result = ""+reloadAlbum+currentPhotoPosition;
-                try {
-                    setResult(Integer.parseInt(result));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
-                }
-                Photo2.super.onBackPressed();
-                overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
+                onBackPressed();
             }
         });
         //Share
@@ -551,6 +543,7 @@ public class Photo2 extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         String result = ""+reloadAlbum+currentPhotoPosition;
         try {
             setResult(Integer.parseInt(result));
@@ -559,7 +552,8 @@ public class Photo2 extends AppCompatActivity {
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
         }
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
+        overridePendingTransition(0, R.anim.slide_down_in);
+        //R.anim.slide_down_out
     }
 
     /**
@@ -572,7 +566,6 @@ public class Photo2 extends AppCompatActivity {
 
         // constructor
         public FullScreenImageAdapter(Activity activity) {
-
             this._activity = activity;
         }
 
@@ -605,9 +598,6 @@ public class Photo2 extends AppCompatActivity {
                 }
             });
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                imgDisplay.setTransitionName("sharedElementTransition"+position);
-            }
 
             if (imageList.get(position).get("key_mime").contains("gif"))
             Glide.with(context)
@@ -622,7 +612,6 @@ public class Photo2 extends AppCompatActivity {
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             (container).removeView((RelativeLayout) object);
-
         }
     }
 

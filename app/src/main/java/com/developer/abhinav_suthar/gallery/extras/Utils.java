@@ -38,8 +38,10 @@ public class Utils {
 
     private static Boolean[] selectedMediaItems;
     public static void setSelectedMediaItems(Boolean[] b){
+        selectedMediaItems = null;
+        //selectedMediaItems = b.clone();
         selectedMediaItems = new Boolean[b.length];
-        selectedMediaItems = b;
+        System.arraycopy(b, 0, selectedMediaItems, 0, b.length);
     }
     public static Boolean[] getSelectedMediaItems(){
         return selectedMediaItems;

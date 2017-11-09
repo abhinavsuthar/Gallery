@@ -9,7 +9,8 @@
     android:layout_marginRight="10dp"
     android:layout_height="70dp"
     android:foreground="?android:attr/selectableItemBackground"
-    android:clickable="true">
+    android:clickable="true"
+    android:focusable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"

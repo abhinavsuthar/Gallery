@@ -7,8 +7,7 @@
         android:id="@+id/albumImage2"
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:scaleType="centerCrop"
-        android:layout_margin="0.5dp"/>
+        android:scaleType="centerCrop"/>
 
     <CheckBox
         android:id="@+id/photo_1_checkBox"

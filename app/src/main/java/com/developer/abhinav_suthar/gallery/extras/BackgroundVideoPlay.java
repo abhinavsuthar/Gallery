@@ -49,8 +49,9 @@ public class BackgroundVideoPlay extends Service {
                         m.pause();
                         audioManager.abandonAudioFocus(listener);
                         contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_clear);
                         startForeground(5198, notification);
+                        updateNotificationTime = false;
+                        stopForeground(false);
                         break;
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                         m.setVolume(0.1F,0.1F);
@@ -132,8 +133,8 @@ public class BackgroundVideoPlay extends Service {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent playVideo = PendingIntent.getActivity(this,500,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(R.drawable.whatsapp_icon)
+        Notification.Builder mBuilder = new Notification.Builder(getApplicationContext())
+                .setSmallIcon(R.mipmap.launcher)
                 .setContent(contentView)
                 .setContentIntent(playVideo);
 
@@ -149,19 +150,24 @@ public class BackgroundVideoPlay extends Service {
         nextIntent.setAction("next");
         PendingIntent pnextIntent = PendingIntent.getBroadcast(this,2,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Intent deleteIntent = new Intent();
+        deleteIntent.setAction("stopService");
+        PendingIntent pDeleteIntent = PendingIntent.getBroadcast(this,3,deleteIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
         contentView.setOnClickPendingIntent(R.id.noti_vd_prev, pprevIntent);
         contentView.setOnClickPendingIntent(R.id.noti_vd_play, pplayIntent);
         contentView.setOnClickPendingIntent(R.id.noti_vd_next, pnextIntent);
+        mBuilder.setDeleteIntent(pDeleteIntent);
 
-        mBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         notification = mBuilder.build();
-        notification.flags |= Notification.FLAG_NO_CLEAR | Notification.DEFAULT_LIGHTS;
+        notification.flags |= Notification.DEFAULT_LIGHTS;
 
         startForeground(5198, notification);
         notificationTime();
     }
 
     private Timer vdNotiTimeTimer;
+    private boolean updateNotificationTime = true;
     private void notificationTime(){
         try {
             vdNotiTimeTimer.cancel();
@@ -180,15 +186,17 @@ public class BackgroundVideoPlay extends Service {
         vdNotiTimeTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                int position = 0;
-                try {
-                    position = m.getCurrentPosition();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (updateNotificationTime){
+                    int position = 0;
+                    try {
+                        position = m.getCurrentPosition();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Date d = new Date(position);
+                    contentView.setTextViewText(R.id.noti_vd_time, df.format(d)+"/"+df.format(d2));
+                    startForeground(5198, notification);
                 }
-                Date d = new Date(position);
-                contentView.setTextViewText(R.id.noti_vd_time, df.format(d)+"/"+df.format(d2));
-                startForeground(5198, notification);
             }
         },0,1000);
     }
@@ -200,6 +208,7 @@ public class BackgroundVideoPlay extends Service {
         filter.addAction("prev");
         filter.addAction("play");
         filter.addAction("next");
+        filter.addAction("stopService");
         filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         this.registerReceiver(handler, filter);
     }
@@ -227,8 +236,9 @@ public class BackgroundVideoPlay extends Service {
 
     @Override
     public void onDestroy() {
+        Utils.setMediaList(videoList);
+        stopVideo();
         try {
-            stopVideo();
             vdNotiTimeTimer.cancel();
             unregisterReceiver(handler);
             audioManager.abandonAudioFocus(listener);
@@ -256,6 +266,7 @@ public class BackgroundVideoPlay extends Service {
                         audioManager.abandonAudioFocus(listener);
                         audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                         playVideo();
+                        updateNotificationTime = true;
                     }
                     break;
                 case "play":
@@ -263,38 +274,41 @@ public class BackgroundVideoPlay extends Service {
                         m.pause();
                         audioManager.abandonAudioFocus(listener);
                         contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_clear);
                         startForeground(5198, notification);
+                        updateNotificationTime = false;
+                        stopForeground(false);
                     }
                     else {
                         int result = audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
                             m.start();
                             contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_pause);
-                            contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_next);
                             startForeground(5198, notification);
+                            updateNotificationTime = true;
                         }else Toast.makeText(getApplicationContext(), "Another application is using audio", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case "next":
-                    if(!m.isPlaying()) stopSelf();
-                    else {
-                        m.stop();
-                        m.release();
-                        m=null;
-                        p++;
-                        if (p==videoList.size()) p--;
-                        audioManager.abandonAudioFocus(listener);
-                        audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                        playVideo();
-                    }
+                    m.stop();
+                    m.release();
+                    m=null;
+                    p++;
+                    if (p==videoList.size()) p--;
+                    audioManager.abandonAudioFocus(listener);
+                    audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                    playVideo();
+                    updateNotificationTime = true;
                     break;
                 case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
                     m.pause();
                     audioManager.abandonAudioFocus(listener);
                     contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                    contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_clear);
                     startForeground(5198, notification);
+                    updateNotificationTime = false;
+                    stopForeground(false);
+                    break;
+                case "stopService":
+                    stopSelf();
                     break;
                 default:
                     Toast.makeText(getApplicationContext(), "Error occurred", Toast.LENGTH_SHORT).show();
