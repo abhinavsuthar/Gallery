@@ -227,7 +227,7 @@ public class Video1 extends AppCompatActivity {
         public VideoAlbumAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.video_0, parent, false);
 
-            itemView.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
+            //itemView.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
 
             return new MyViewHolder(itemView);
         }
@@ -340,7 +340,7 @@ public class Video1 extends AppCompatActivity {
             //holder.VdCardView.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
             //holder.VdCardView.setDrawingCacheBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
             //holder.VdShare.setBackgroundColor(Color.parseColor ("#"+mColors[new Random().nextInt(254)]));
-            holder.VdCardView.setCardBackgroundColor(Color.RED);
+            //holder.VdCardView.setCardBackgroundColor(Color.RED);
 
         }
 

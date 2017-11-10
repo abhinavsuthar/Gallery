@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(context, Photo1.class);
                     intent.putExtra("key_album", photoAlbumDetail.get("key_album"));
                     startActivityForResult(intent, 501);
-                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.fade_out);
+                    overridePendingTransition(R.anim.slide_in_left, android.R.anim.fade_out);
 
 
                 }
