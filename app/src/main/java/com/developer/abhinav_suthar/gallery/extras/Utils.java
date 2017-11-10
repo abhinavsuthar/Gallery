@@ -31,10 +31,10 @@ public class Utils {
 
     //Photo1 to Photo2 and Video1 to Video2
     private static ArrayList<HashMap<String, String>> mediaList = new ArrayList<>();
-    public static void setMediaList(ArrayList<HashMap<String, String>> mediaListt){ mediaList = mediaListt;}
+    public static void setMediaList(ArrayList<HashMap<String, String>> mediaListt){ mediaList = mediaListt;
+        Log.e("MediaListCalled", "mediaSet");}
     public static ArrayList<HashMap<String, String>> getMediaList(){
-        Log.e("List Size", ""+mediaList.size());
-        return mediaList; }
+        Log.e("MediaListCalled", "mediaGet");return mediaList; }
 
     private static Boolean[] selectedMediaItems;
     public static void setSelectedMediaItems(Boolean[] b){

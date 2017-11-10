@@ -13,7 +13,6 @@ import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -96,8 +95,8 @@ public class BackgroundVideoPlay extends Service {
                         m.seekTo(0);
                         audioManager.abandonAudioFocus(listener);
                         contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_clear);
                         startForeground(5198, notification);
+                        stopForeground(false);
                     }else{
                         m.stop();
                         m.release();

@@ -393,18 +393,8 @@ public class Video2 extends AppCompatActivity{
         findViewById(R.id.v2imgBackgroundPlay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(new Intent(Video2.this, BackgroundVideoPlay.class));
-                Intent intent = new Intent(Video2.this, BackgroundVideoPlay.class);
-                intent.putExtra("video_number",p);
-                intent.putExtra("video_position", videoView.getCurrentPosition());
-                startService(intent);
-                backPlay = false;
-
-                am.abandonAudioFocus(listener);
-                unregisterReceiver(handler);
-
-                Video2.super.onBackPressed();
-                overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
+                backPlay = true;
+                onBackPressed();
             }
         });
     }
@@ -486,7 +476,7 @@ public class Video2 extends AppCompatActivity{
         }
         am.abandonAudioFocus(listener);
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_out, R.anim.slide_down_in);
+        overridePendingTransition(0, R.anim.slide_down_in);
     }
 
     @Override

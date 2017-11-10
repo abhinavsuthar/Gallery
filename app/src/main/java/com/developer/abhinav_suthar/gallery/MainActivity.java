@@ -1,7 +1,6 @@
 package com.developer.abhinav_suthar.gallery;
 
 import android.Manifest;
-import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +10,6 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -245,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
             if (cursorExternal != null) cursorExternal.close();
             if (cursorInternal != null) cursorInternal.close();
             cursor.close();
-            return "Abhi";
+            return "null";
         }
 
         @Override
@@ -258,9 +256,9 @@ public class MainActivity extends AppCompatActivity {
             GridLayoutManager layoutManager;
             int orientation = context.getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                layoutManager = new GridLayoutManager(context, 3);
+                layoutManager = new GridLayoutManager(context, 2);
             } else {
-                layoutManager = new GridLayoutManager(context, 5);
+                layoutManager = new GridLayoutManager(context, 3);
             }
 
             if(recyclerView!=null){
@@ -287,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public PhotosAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
             View itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.photo_0, parent, false);
 
