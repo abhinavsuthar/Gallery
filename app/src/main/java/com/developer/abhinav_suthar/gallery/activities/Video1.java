@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery;
+package com.developer.abhinav_suthar.gallery.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MergeCursor;
-import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,7 +41,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.developer.abhinav_suthar.gallery.extras.ServiceCopyDelete;
+import com.developer.abhinav_suthar.gallery.R;
+import com.developer.abhinav_suthar.gallery.services.ServiceCopyDelete;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
@@ -58,7 +58,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 
 public class Video1 extends AppCompatActivity {
@@ -653,7 +652,7 @@ public class Video1 extends AppCompatActivity {
 
     private void onCreateOptionMenu(Menu menu){
 
-        getMenuInflater().inflate(R.menu.photo_1_menu, menu);
+        getMenuInflater().inflate(R.menu.basic_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.photo_1_action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -744,7 +743,7 @@ public class Video1 extends AppCompatActivity {
                 reloadAdapter(0);
                 break;
             case R.id.photo_1_action_about:
-                startActivity(new Intent(context, About.class));
+                startActivity(new Intent(context, z_About.class));
                 break;
             case R.id.video_1_auto_play:
                 editor2.putBoolean("key_autoPlay", !autoPlay.isChecked());

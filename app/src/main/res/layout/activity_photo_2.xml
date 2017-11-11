@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.developer.abhinav_suthar.gallery.Photo2">
+    tools:context="com.developer.abhinav_suthar.gallery.activities.Photo2">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"

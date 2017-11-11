@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000"
-    tools:context="com.developer.abhinav_suthar.gallery.Video2"
+    tools:context="com.developer.abhinav_suthar.gallery.activities.Video2"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <VideoView

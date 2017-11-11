@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.developer.abhinav_suthar.gallery.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,17 +24,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.developer.abhinav_suthar.gallery.Photo1"
+            android:name=".activities.Photo1"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.developer.abhinav_suthar.gallery.Photo2"
+            android:name=".activities.Photo2"
             android:largeHeap="true"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"/>
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
         <activity
-            android:name="com.developer.abhinav_suthar.gallery.Video1"
+            android:name=".activities.Video1"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.developer.abhinav_suthar.gallery.Video2"
+            android:name=".activities.Video2"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
             <intent-filter>
@@ -46,8 +46,21 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activities.z_About" />
+
+        <activity
+            android:name=".activities.z_Settings"
+            android:theme="@style/AppTheme"/>
+
+        <service
+            android:name=".services.BackgroundVideoPlay"
+            android:enabled="true"
+            android:exported="false" />
+        <service android:name=".services.ServiceCopyDelete" />
+        <service android:name=".services.OnMediaListChange" />
+
         <provider
-            android:name="com.developer.abhinav_suthar.gallery.extras.GenericFileProvider"
+            android:name=".extras.GenericFileProvider"
             android:authorities="${applicationId}.com.developer.abhinav_suthar.gallery.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -56,13 +69,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name="com.developer.abhinav_suthar.gallery.About" />
-
-        <service
-            android:name="com.developer.abhinav_suthar.gallery.extras.BackgroundVideoPlay"
-            android:enabled="true"
-            android:exported="false"/>
-        <service android:name=".extras.ServiceCopyDelete" />
     </application>
 
 </manifest>

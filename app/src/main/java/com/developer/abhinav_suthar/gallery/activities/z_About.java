@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery;
+package com.developer.abhinav_suthar.gallery.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -13,16 +13,18 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class About extends AppCompatActivity {
+import com.developer.abhinav_suthar.gallery.R;
+
+public class z_About extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+        setContentView(R.layout.activity_z_about);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("About");
+        getSupportActionBar().setTitle("z_About");
 
         functions();
     }
@@ -60,8 +62,8 @@ public class About extends AppCompatActivity {
         aboutMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(About.this, R.style.AnimDialog);
-                builder.setTitle("About Me ! ! !")
+                AlertDialog.Builder builder = new AlertDialog.Builder(z_About.this, R.style.AnimDialog);
+                builder.setTitle("z_About Me ! ! !")
                         .setMessage("My name is Abhinav Suthar\nI am studying at IIT Jodhpur\n" +
                                 "abhinav.suthar.50@gmail.com\n+917240505099")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {

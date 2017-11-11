@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery.extras;
+package com.developer.abhinav_suthar.gallery.services;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -17,7 +17,8 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.developer.abhinav_suthar.gallery.R;
-import com.developer.abhinav_suthar.gallery.Video2;
+import com.developer.abhinav_suthar.gallery.activities.Video2;
+import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.util.TimerTask;
 
 public class BackgroundVideoPlay extends Service {
     private AudioManager audioManager;
-    private ArrayList<HashMap<String,String>> videoList;
+    private static ArrayList<HashMap<String,String>> videoList;
     private int p,videoPos;
     private static MediaPlayer m;
     private AudioManager.OnAudioFocusChangeListener listener = new AudioManager.OnAudioFocusChangeListener() {
@@ -213,6 +214,7 @@ public class BackgroundVideoPlay extends Service {
     }
 
     public static int stopVideo(){
+        Utils.setMediaList(videoList);
         try {
             if (m!=null){
                 int videoPos = m.getCurrentPosition();
@@ -235,7 +237,6 @@ public class BackgroundVideoPlay extends Service {
 
     @Override
     public void onDestroy() {
-        Utils.setMediaList(videoList);
         stopVideo();
         try {
             vdNotiTimeTimer.cancel();

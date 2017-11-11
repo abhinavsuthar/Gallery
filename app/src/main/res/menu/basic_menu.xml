@@ -4,41 +4,45 @@
 
     <item
         android:id="@+id/photo_1_action_search"
-        android:title="Search"
+        android:title="@string/menu_search"
         app:showAsAction="ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
-        android:title="Sort by"
+        android:title="@string/menu_sort_by"
         android:icon="@drawable/sort_icon"
         app:showAsAction="always">
         <menu>
             <group android:checkableBehavior="all">
                 <item
                     android:id="@+id/photo_1_action_title"
-                    android:title="Title"
+                    android:title="@string/menu_title"
                     app:showAsAction="never" />
                 <item
                     android:id="@+id/photo_1_action_size"
-                    android:title="Size"
+                    android:title="@string/menu_size"
                     app:showAsAction="never" />
                 <item
                     android:id="@+id/photo_1_action_date"
-                    android:title="Date Modified"
+                    android:title="@string/menu_date_modified"
                     app:showAsAction="never"/>
             </group>
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/photo_1_action_menu_sort_asc"
-                    android:title="Ascending"/>
+                    android:title="@string/menu_ascending"/>
                 <item
                     android:id="@+id/photo_1_action_menu_sort_dsc"
-                    android:title="Descending"/>
+                    android:title="@string/menu_descending"/>
             </group>
         </menu>
     </item>
     <item
         android:id="@+id/photo_1_action_about"
-        android:title="About"
+        android:title="@string/menu_about"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/photo_1_action_settings"
+        android:title="@string/menu_settings"
         app:showAsAction="never"/>
     <item
         android:id="@+id/video_1_auto_play"

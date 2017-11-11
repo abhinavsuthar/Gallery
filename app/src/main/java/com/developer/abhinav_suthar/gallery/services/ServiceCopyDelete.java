@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery.extras;
+package com.developer.abhinav_suthar.gallery.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.developer.abhinav_suthar.gallery.R;
+import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;

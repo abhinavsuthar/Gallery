@@ -10,7 +10,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.developer.abhinav_suthar.gallery.About"
+        tools:context="com.developer.abhinav_suthar.gallery.activities.z_About"
         android:orientation="vertical">
 
         <android.support.v7.widget.CardView

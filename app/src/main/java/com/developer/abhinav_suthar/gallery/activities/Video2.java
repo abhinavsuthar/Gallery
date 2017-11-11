@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery;
+package com.developer.abhinav_suthar.gallery.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,7 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.developer.abhinav_suthar.gallery.extras.BackgroundVideoPlay;
+import com.developer.abhinav_suthar.gallery.R;
+import com.developer.abhinav_suthar.gallery.services.BackgroundVideoPlay;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.text.DateFormat;

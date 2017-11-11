@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery;
+package com.developer.abhinav_suthar.gallery.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -42,7 +42,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.developer.abhinav_suthar.gallery.extras.ServiceCopyDelete;
+import com.developer.abhinav_suthar.gallery.R;
+import com.developer.abhinav_suthar.gallery.services.ServiceCopyDelete;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
@@ -508,7 +509,7 @@ public class Photo1 extends AppCompatActivity {
         private void closeSelectionMode(){
             showCheckBox = false;
             menu.clear();
-            getMenuInflater().inflate(R.menu.photo_1_menu, menu);
+            getMenuInflater().inflate(R.menu.basic_menu, menu);
             getSupportActionBar().setTitle(albumName);
             notifyDataSetChanged();
             for (int i=0; i<imageList.size();i++){
@@ -859,7 +860,7 @@ public class Photo1 extends AppCompatActivity {
         public void closeSelectionMode(){
             showCheckBox = false;
             menu.clear();
-            getMenuInflater().inflate(R.menu.photo_1_menu, menu);
+            getMenuInflater().inflate(R.menu.basic_menu, menu);
             getSupportActionBar().setTitle(albumName);
             notifyDataSetChanged();
             for (int i=0; i<imageList.size();i++){
@@ -935,7 +936,7 @@ public class Photo1 extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.photo_1_menu, menu);
+        getMenuInflater().inflate(R.menu.basic_menu, menu);
         this.menu = menu;
         MenuItem searchItem = menu.findItem(R.id.photo_1_action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -1013,8 +1014,10 @@ public class Photo1 extends AppCompatActivity {
                 reloadAdapter();
                 break;
             case R.id.photo_1_action_about:
-                startActivity(new Intent(context, About.class));
+                startActivity(new Intent(context, z_About.class));
                 break;
+            case R.id.photo_1_action_settings:
+                startActivity(new Intent(context, z_Settings.class));
             default:
                 return super.onOptionsItemSelected(item);
         }

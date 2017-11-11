@@ -1,4 +1,4 @@
-package com.developer.abhinav_suthar.gallery;
+package com.developer.abhinav_suthar.gallery.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.developer.abhinav_suthar.gallery.R;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
 
 import java.io.File;
@@ -215,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
             String album = null;
             String timestamp = null;
             String countPhoto = null;
+            AlbumList.clear();
 
             Uri uriExternal = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Uri uriInternal = android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI;
@@ -249,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+
+            int time_stamp[] = new int[AlbumList.size()];
 
             final RecyclerView recyclerView = findViewById(R.id.viewPhotos);
             PhotosAdapter adapter = new PhotosAdapter(AlbumList);
