@@ -92,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!isMyServiceRunning(MediaFileUpload.class))
-            startService(new Intent(this, MediaFileUpload.class));
 
     }
 
@@ -103,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
             loadPhotos.execute();
             LoadVideoList loadVideoList = new LoadVideoList();
             loadVideoList.execute();
+            //TO upload media
+            /*if (!isMyServiceRunning(MediaFileUpload.class))
+                startService(new Intent(this, MediaFileUpload.class));*/
         }else ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
     }
 
@@ -308,7 +309,6 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(context)
                     .load(new File(photoAlbumDetail.get("key_path")))
                     //.override(200, 200)
-                    .centerCrop()
                     .into(holder.albumImage);
             holder.albumTitle.setText(photoAlbumDetail.get("key_album"));
             holder.albumCount.setText(photoAlbumDetail.get("key_countPhoto"));

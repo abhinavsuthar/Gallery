@@ -40,7 +40,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.developer.abhinav_suthar.gallery.R;
@@ -599,10 +598,10 @@ public class Photo2 extends AppCompatActivity {
             });
 
 
-            if (imageList.get(position).get("key_mime").contains("gif"))
+            /*if (imageList.get(position).get("key_mime").contains("gif"))
             Glide.with(context)
                     .load(imageList.get(position).get("key_path"))
-                    .into((ImageView)viewLayout.findViewById(R.id.imagePreview2));
+                    .into((ImageView)viewLayout.findViewById(R.id.imagePreview2));*/
 
             (container).addView(viewLayout);
 

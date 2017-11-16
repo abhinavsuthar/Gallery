@@ -4,27 +4,27 @@
 
     <item
         android:id="@+id/selection_select_all"
-        android:title="Select All"
+        android:title="@string/menu_select_all"
         android:icon="@drawable/select_all_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_share"
-        android:title="Share"
+        android:title="@string/menu_share"
         android:icon="@drawable/share_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_copy"
-        android:title="Copy"
+        android:title="@string/menu_copy"
         android:icon="@drawable/copy_icon"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/selection_delete"
-        android:title="Delete"
+        android:title="@string/menu_delete"
         android:icon="@drawable/delete_icon"
         app:showAsAction="always"/>
     <item
         android:id="@+id/selection_close"
-        android:title="Close"
+        android:title="@string/menu_close"
         android:icon="@drawable/cancel_icon"
         app:showAsAction="ifRoom"/>
 </menu>

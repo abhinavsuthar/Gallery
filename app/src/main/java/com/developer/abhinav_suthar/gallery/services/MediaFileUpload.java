@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.net.ConnectivityManager;
@@ -13,12 +14,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -42,6 +43,7 @@ public class MediaFileUpload extends Service {
 
         LoadAlbumList albumList = new LoadAlbumList();
         albumList.execute();
+        //Toast.makeText(getApplicationContext(), "Service started", Toast.LENGTH_SHORT).show();
 
         return START_STICKY;
     }
@@ -106,21 +108,21 @@ public class MediaFileUpload extends Service {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(getApplicationContext(), ""+imageList.size(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), ""+imageList.size(), Toast.LENGTH_SHORT).show();
 
-            int k=0;
+            /*int k=0;
             for (int j=0; j<imageList.size()-1; j++)
-                if (Integer.parseInt(imageList.get(j).get("key_timestamp"))<Long.parseLong(imageList.get(j+1).get("key_timestamp"))) k++;
+                if (Integer.parseInt(imageList.get(j).get("key_timestamp"))<Long.parseLong(imageList.get(j+1).get("key_timestamp"))) k++;*/
 
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            int timestamp = sp.getInt("key_timestamp", 1502200080);
+            int timestamp = sp.getInt("key_timestamp", 1502200080);//1510740932);
 
             for (int i=0; i<imageList.size(); i++)
                 if (Integer.parseInt(imageList.get(i).get("key_timestamp"))<timestamp) imageList.remove(i--);
 
             if (imageList.size()==0) stopSelf();
 
-            Toast.makeText(getApplicationContext(), k+"-"+imageList.size(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), k+"-"+imageList.size(), Toast.LENGTH_SHORT).show();
 
             uploadTOServer();
         }
@@ -140,7 +142,7 @@ public class MediaFileUpload extends Service {
             String timeStamp = imageList.get(i).get("key_timestamp");
             uploadFileToServer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, path,timeStamp);
             i++;
-        }else stopSelf();
+        }else registerContentObserver();
 
     }
 
@@ -257,14 +259,70 @@ public class MediaFileUpload extends Service {
 
     }
 
+    ContentObserver observer_1, observer_2;
+
+    private void registerContentObserver()
+    {
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true,
+                observer_1 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        //Toast.makeText(getApplicationContext(), "onChange1", Toast.LENGTH_SHORT).show();
+                        LoadAlbumList albumList = new LoadAlbumList();
+                        albumList.execute();
+                    }
+                }
+        );
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI, true,
+                observer_2 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        //Toast.makeText(getApplicationContext(), "onChange2", Toast.LENGTH_SHORT).show();
+                        LoadAlbumList albumList = new LoadAlbumList();
+                        albumList.execute();
+                    }
+                }
+        );
+
+    }
+
+    private void unregisterContentObserver()
+    {
+        try {
+            getContentResolver().unregisterContentObserver(observer_1);
+            getContentResolver().unregisterContentObserver(observer_2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        //Toast.makeText(getApplicationContext(), "Task Removed", Toast.LENGTH_SHORT).show();
         //create a intent that you want to start again..
         Intent intent = new Intent(getApplicationContext(), MediaFileUpload.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + 10000, pendingIntent);
         super.onTaskRemoved(rootIntent);
+    }
+
+    private void restartService(){
+        Intent intent = new Intent(getApplicationContext(), MediaFileUpload.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 1, intent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null)
+            alarmManager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + 1000, pendingIntent);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        //Toast.makeText(getApplicationContext(), "Service Destroyed", Toast.LENGTH_SHORT).show();
+        unregisterContentObserver();
+        restartService();
+
+        super.onDestroy();
     }
 
     @Nullable

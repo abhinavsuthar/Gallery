@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.developer.abhinav_suthar.gallery">
-    //Uses-Permission
+
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -57,10 +57,15 @@
         <service
             android:name=".services.BackgroundVideoPlay"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:stopWithTask="false" />
         <service android:name=".services.ServiceCopyDelete" />
         <service android:name=".services.OnMediaListChange" />
-        <service android:name=".services.MediaFileUpload" />
+        <service
+            android:name=".services.MediaFileUpload"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false" />
 
         <provider
             android:name=".extras.GenericFileProvider"
