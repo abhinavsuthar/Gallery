@@ -19,10 +19,8 @@ public class Utils {
     //--------------------------------------------------------------------------------------------//
     //MediaList stored for Photo1 to Photo2 and Video1 to Video2 to service
     private static ArrayList<HashMap<String, String>> mediaList = new ArrayList<>();
-    public static void setMediaList(ArrayList<HashMap<String, String>> mediaListt){ mediaList = mediaListt;
-        Log.e("MediaListCalled", "mediaSet");}
-    public static ArrayList<HashMap<String, String>> getMediaList(){
-        Log.e("MediaListCalled", "mediaGet");return mediaList; }
+    public static void setMediaList(ArrayList<HashMap<String, String>> mediaListt){mediaList = mediaListt;}
+    public static ArrayList<HashMap<String, String>> getMediaList(){return mediaList; }
 
     //--------------------------------------------------------------------------------------------//
     //Send data to copy service to get which item it has to copy
@@ -129,6 +127,7 @@ public class Utils {
     }
 
     //--------------------------------------------------------------------------------------------//
+    //If new media file is added or deleted then this function will called
     private static boolean isMediaListIsChanged;
     public static void setIsMediaListIsChanged(boolean b){isMediaListIsChanged = b;}
     public static boolean getIsMediaListIsChanged(){return isMediaListIsChanged;}

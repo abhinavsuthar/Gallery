@@ -1,6 +1,7 @@
 package com.developer.abhinav_suthar.gallery.activities;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,6 +38,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.R;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
+import com.developer.abhinav_suthar.gallery.services.MediaFileUpload;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -89,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        if (!isMyServiceRunning(MediaFileUpload.class))
+            startService(new Intent(this, MediaFileUpload.class));
+
     }
 
     private void loadAlbum(){
@@ -216,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
             String album = null;
             String timestamp = null;
             String countPhoto = null;
-            AlbumList.clear();
 
             Uri uriExternal = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Uri uriInternal = android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI;
@@ -475,6 +480,16 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (pageNumber==1) mViewPager.setCurrentItem(0);
         else super.onBackPressed();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

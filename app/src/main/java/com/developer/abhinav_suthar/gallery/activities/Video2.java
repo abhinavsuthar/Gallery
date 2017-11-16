@@ -32,8 +32,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.developer.abhinav_suthar.gallery.R;
-import com.developer.abhinav_suthar.gallery.services.BackgroundVideoPlay;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
+import com.developer.abhinav_suthar.gallery.services.BackgroundVideoPlay;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -54,37 +54,7 @@ public class Video2 extends AppCompatActivity{
     private MediaPlayer mp;
     private AudioManager am;
     private Timer vdCurrTime, t = new Timer();
-    private AudioManager.OnAudioFocusChangeListener listener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int i) {
-            switch (i) {
-                case AudioManager.AUDIOFOCUS_GAIN:
-                    try {
-                        mp.setVolume(1F, 1F);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS:
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                    try {
-                        mp.pause();
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
-                    }
-                    am.abandonAudioFocus(listener);
-                    ((ImageButton)findViewById(R.id.v2pause)).setImageResource(android.R.drawable.ic_media_play);
-                    break;
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    try {
-                        mp.setVolume(0.1F, 0.1F);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
-    };
+    private AudioManager.OnAudioFocusChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +81,7 @@ public class Video2 extends AppCompatActivity{
             videoList = Utils.getMediaList();
             p = getIntent().getIntExtra("key_pos", 0);
             seekTo=0;
+            //Toast.makeText(this, videoList.size(), Toast.LENGTH_SHORT).show();
         }
 
         am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
@@ -184,6 +155,8 @@ public class Video2 extends AppCompatActivity{
         });
     }
 
+    //--------------------------------------------------------------------------------------------//
+    //All about media controller
     private void mediaController(){
 
         findViewById(R.id.video_2_layout).setOnClickListener(new View.OnClickListener() {
@@ -317,7 +290,6 @@ public class Video2 extends AppCompatActivity{
 
         ((TextView) findViewById(R.id.v2txtVdName)).setText(videoList.get(p).get("key_displayName"));
     }
-
     private void hideShowMediaController(){
         final LinearLayout top    = findViewById(R.id.v2TopLayout);
         final LinearLayout bottom = findViewById(R.id.v2BottomLayout);
@@ -384,6 +356,8 @@ public class Video2 extends AppCompatActivity{
         }
     }
 
+    //--------------------------------------------------------------------------------------------//
+    // on back image and background image click listener
     private void actionBarController(){
         findViewById(R.id.v2imgBackButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -400,6 +374,8 @@ public class Video2 extends AppCompatActivity{
         });
     }
 
+    //--------------------------------------------------------------------------------------------//
+    //On screen orientation change
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -409,7 +385,6 @@ public class Video2 extends AppCompatActivity{
         else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) fixVideoOrientation();
         mediaController();
     }
-
     private void fixVideoOrientation(){
         //VideoResolution
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -434,22 +409,6 @@ public class Video2 extends AppCompatActivity{
             params.height = (int) ((float) width2 / videoProportion);
             videoView.setLayoutParams(params);
 
-            /*ValueAnimator anim = ValueAnimator.ofInt(videoView.getMeasuredHeight(), (int) ((float) width2 / videoProportion))
-                    .setDuration(1500);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
-                    layoutParams.height = val;
-                    videoView.setLayoutParams(layoutParams);
-                }
-            });
-            AnimatorSet set = new AnimatorSet();
-            set.play(anim);
-            set.setInterpolator(new AccelerateDecelerateInterpolator());
-            set.start();*/
-
         }else {
 
             ViewGroup.LayoutParams params = videoView.getLayoutParams();
@@ -470,6 +429,7 @@ public class Video2 extends AppCompatActivity{
             startService(intent);
             backPlay = false;
         }
+        
         try {
             unregisterReceiver(handler);
         } catch (Exception e) {
@@ -517,5 +477,42 @@ public class Video2 extends AppCompatActivity{
                 am.abandonAudioFocus(listener);
             }
         }
+    }
+
+
+    //--------------------------------------------------------------------------------------------//
+    //On audio focus change listener initialization
+    {
+        listener = new AudioManager.OnAudioFocusChangeListener() {
+            @Override
+            public void onAudioFocusChange(int i) {
+                switch (i) {
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                        try {
+                            mp.setVolume(1F, 1F);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        try {
+                            mp.pause();
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
+                        }
+                        am.abandonAudioFocus(listener);
+                        ((ImageButton) findViewById(R.id.v2pause)).setImageResource(android.R.drawable.ic_media_play);
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        try {
+                            mp.setVolume(0.1F, 0.1F);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        };
     }
 }

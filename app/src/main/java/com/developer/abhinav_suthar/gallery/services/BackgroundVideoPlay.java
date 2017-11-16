@@ -214,13 +214,13 @@ public class BackgroundVideoPlay extends Service {
     }
 
     public static int stopVideo(){
-        Utils.setMediaList(videoList);
         try {
             if (m!=null){
                 int videoPos = m.getCurrentPosition();
                 m.stop();
                 m.release();
                 m=null;
+                Utils.setMediaList(videoList);
                 return videoPos;
             }else return 0;
         } catch (IllegalStateException e) {

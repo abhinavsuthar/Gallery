@@ -42,8 +42,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.R;
-import com.developer.abhinav_suthar.gallery.services.ServiceCopyDelete;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
+import com.developer.abhinav_suthar.gallery.services.ServiceCopyDelete;
 
 import java.io.File;
 import java.io.FileInputStream;
