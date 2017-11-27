@@ -6,12 +6,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
@@ -89,6 +91,7 @@ public class Video1 extends AppCompatActivity {
     private void loadVideoList(){
         LoadVideoAlbum videoAlbum = new LoadVideoAlbum();
         videoAlbum.execute(albumName);
+        registerContentObserver();
     }
 
     @Override
@@ -873,4 +876,45 @@ public class Video1 extends AppCompatActivity {
         recyclerView.scrollToPosition(pos);
     }
 
+
+    ContentObserver observer_1, observer_2;
+
+    private void registerContentObserver()
+    {
+        unregisterContentObserver();
+
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true,
+                observer_1 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        loadVideoList();
+                    }
+                }
+        );
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Video.Media.INTERNAL_CONTENT_URI, true,
+                observer_2 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        loadVideoList();
+                    }
+                }
+        );
+
+    }
+
+    private void unregisterContentObserver()
+    {
+        try {
+            getContentResolver().unregisterContentObserver(observer_1);
+            getContentResolver().unregisterContentObserver(observer_2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterContentObserver();
+    }
 }

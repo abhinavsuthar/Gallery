@@ -1,23 +1,22 @@
 package com.developer.abhinav_suthar.gallery.activities;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,110 +30,62 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.developer.abhinav_suthar.gallery.R;
+import com.developer.abhinav_suthar.gallery.adapters.Main_AudioAdapter;
+import com.developer.abhinav_suthar.gallery.adapters.Main_PhotoAdapter;
+import com.developer.abhinav_suthar.gallery.adapters.Main_VideoAdapter;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
-import com.developer.abhinav_suthar.gallery.services.MediaFileUpload;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
     public Context context;
-    private int pageNumber = 0;
     private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+
         setContentView(R.layout.activity_main);
+        context = this;
 
-        loadAlbum();
 
-        context = MainActivity.this;
 
+
+
+        //Setup view pager and tab layout
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
-
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                pageNumber = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
+        loadAlbum();
+        registerContentObserver();
 
     }
 
     private void loadAlbum(){
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            LoadAlbumList loadPhotos = new LoadAlbumList();
-            loadPhotos.execute();
-            LoadVideoList loadVideoList = new LoadVideoList();
-            loadVideoList.execute();
-            //TO upload media
-            /*if (!isMyServiceRunning(MediaFileUpload.class))
-                startService(new Intent(this, MediaFileUpload.class));*/
-        }else ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED){
+            new LoadPhotoAlbumList().execute();
+            new LoadVideoAlbumList().execute();
+            //new LoadAudioList().execute();
+        }else ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
-            case 501:{
-                if (resultCode==RESULT_OK) loadAlbum();
-            }case 502:{
-                if (resultCode==RESULT_OK) loadAlbum();
-            }
-        }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 101:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {loadAlbum();break;}
-                else Toast.makeText(MainActivity.this, "You must give access to storage.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -147,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 2 total pages.
-            return 2;
+            // Show 3 total pages.
+            return 3;
         }
 
         @Override
@@ -158,25 +109,16 @@ public class MainActivity extends AppCompatActivity {
                     return "Photos";
                 case 1:
                     return "Videos";
+                case 2:
+                    return "Music";
             }
             return null;
         }
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
@@ -185,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
-        public PlaceholderFragment() {
-        }
+        public PlaceholderFragment() {}
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -195,19 +136,18 @@ public class MainActivity extends AppCompatActivity {
 
             if (sectionNumber==1) {
                 return inflater.inflate(R.layout.tab1_photos, container, false);
-
             }else if (sectionNumber==2){
                 return inflater.inflate(R.layout.tab2_videos, container, false);
-            }
-            return null;
+            }else if (sectionNumber==3) {
+                return inflater.inflate(R.layout.tab2_videos, container, false);
+            }return null;
         }
 
     }
 
-    /**
-     * LoadAlbumList
-     */
-    private class LoadAlbumList extends AsyncTask<String, Void, String> {
+
+
+    private class LoadPhotoAlbumList extends AsyncTask<String, Void, String> {
 
         private ArrayList<HashMap<String, String>> AlbumList = new ArrayList<>();
 
@@ -219,10 +159,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            String path = null;
-            String album = null;
-            String timestamp = null;
-            String countPhoto = null;
+            String path, album, timestamp, countPhoto;
 
             Uri uriExternal = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             Uri uriInternal = android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI;
@@ -231,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             Cursor cursorExternal = getContentResolver().query(uriExternal, projection, "_data IS NOT NULL) GROUP BY (bucket_display_name", null, null);
             Cursor cursorInternal = getContentResolver().query(uriInternal, projection, "_data IS NOT NULL) GROUP BY (bucket_display_name", null, null);
             Cursor cursor = new MergeCursor(new Cursor[]{cursorExternal, cursorInternal});
+
 
             while (cursor.moveToNext()) {
 
@@ -261,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
             int time_stamp[] = new int[AlbumList.size()];
 
             final RecyclerView recyclerView = findViewById(R.id.viewPhotos);
-            PhotosAdapter adapter = new PhotosAdapter(AlbumList);
+            Main_PhotoAdapter main_photoAdapter = new Main_PhotoAdapter(context, AlbumList);
+            //PhotosAdapter adapter = new PhotosAdapter(AlbumList);
 
             GridLayoutManager layoutManager;
             int orientation = context.getResources().getConfiguration().orientation;
@@ -274,78 +213,13 @@ public class MainActivity extends AppCompatActivity {
             if(recyclerView!=null){
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setHasFixedSize(true);
-                recyclerView.setAdapter(adapter);
+                recyclerView.setAdapter(main_photoAdapter);
             }
 
             Utils.ImageAlbumDetails(AlbumList);
         }
     }
-
-    /**
-     * PhotosAdapter
-     */
-    class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.MyViewHolder>{
-
-        private ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
-
-        public PhotosAdapter(ArrayList<HashMap<String, String>> albumList){
-            this.albumList = albumList;
-
-        }
-
-        @Override
-        public PhotosAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.photo_0, parent, false);
-
-            return new MyViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(final PhotosAdapter.MyViewHolder holder, int position) {
-            final HashMap<String, String> photoAlbumDetail = albumList.get(position);
-
-            Glide.with(context)
-                    .load(new File(photoAlbumDetail.get("key_path")))
-                    //.override(200, 200)
-                    .into(holder.albumImage);
-            holder.albumTitle.setText(photoAlbumDetail.get("key_album"));
-            holder.albumCount.setText(photoAlbumDetail.get("key_countPhoto"));
-
-            holder.albumImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, Photo1.class);
-                    intent.putExtra("key_album", photoAlbumDetail.get("key_album"));
-                    startActivityForResult(intent, 501);
-                    overridePendingTransition(R.anim.slide_in_left, android.R.anim.fade_out);
-
-
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return albumList.size();
-        }
-        public class MyViewHolder extends RecyclerView.ViewHolder{
-            private ImageView albumImage;
-            private TextView albumTitle, albumCount;
-            private MyViewHolder(View itemView) {
-                super(itemView);
-                albumImage = itemView.findViewById(R.id.albumImage);
-                albumTitle = itemView.findViewById(R.id.albumTitle);
-                albumCount = itemView.findViewById(R.id.albumCount);
-            }
-        }
-    }
-
-    /**
-     * LoadAlbumList
-     */
-    private class LoadVideoList extends AsyncTask<String, Void, String> {
+    private class LoadVideoAlbumList extends AsyncTask<String, Void, String> {
 
         private ArrayList<HashMap<String, String>> VideoList = new ArrayList<>();
 
@@ -357,10 +231,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            String path = null;
-            String album = null;
-            String timestamp = null;
-            String countPhoto = null;
+            String path, album, timestamp, countPhoto;
 
             Uri uriExternal = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
             Uri uriInternal = android.provider.MediaStore.Video.Media.INTERNAL_CONTENT_URI;
@@ -397,8 +268,74 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
+            RecyclerView recyclerView = findViewById(R.id.viewVideos);
+            //VideoAdapter adapter = new VideoAdapter(VideoList);
+            Main_VideoAdapter main_videoAdapter = new Main_VideoAdapter(context, VideoList);
+
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+
+            if(recyclerView!=null){
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setAdapter(main_videoAdapter);
+            }
+            Utils.VideoAlbumDetails(VideoList);
+        }
+    }
+    private class LoadAudioList extends AsyncTask<String, Void, String> {
+
+        private ArrayList<HashMap<String, String>> VideoList = new ArrayList<>();
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            String path;
+            String name;
+            String timestamp;
+            String duration;
+
+            Uri uriExternal = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Uri uriInternal = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+
+            String[] projection = {MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DATE_MODIFIED,
+                    MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DURATION};
+            Cursor cursorExternal = getContentResolver().query(uriExternal, projection, null, null, null);
+            Cursor cursorInternal = getContentResolver().query(uriInternal, projection, null, null, null);
+            Cursor cursor = new MergeCursor(new Cursor[]{cursorExternal, cursorInternal});
+
+            while (cursor.moveToNext()) {
+
+                path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+                name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                timestamp = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED));
+                duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED));
+                HashMap<String, String> temp = new HashMap<>();
+                temp.put("key_path", path);
+                temp.put("key_name", name);
+                temp.put("key_timestamp", timestamp);
+                temp.put("key_duration", duration);
+
+                VideoList.add(temp);
+            }
+            if (cursorExternal != null) cursorExternal.close();
+            if (cursorInternal != null) cursorInternal.close();
+            cursor.close();
+            return "Abhi";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            Toast.makeText(MainActivity.this, ""+VideoList.size(), Toast.LENGTH_SHORT).show();
+
             final RecyclerView recyclerView = findViewById(R.id.viewVideos);
-            VideoAdapter adapter = new VideoAdapter(VideoList);
+            Main_AudioAdapter adapter = new Main_AudioAdapter(VideoList);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
 
@@ -411,85 +348,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * VideoAdapter
-     */
-    class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder>{
 
-        private ArrayList<HashMap<String, String>> VideoList = new ArrayList<>();
 
-        public VideoAdapter(ArrayList<HashMap<String, String>> VideoList){
-            this.VideoList = VideoList;
-        }
 
-        @Override
-        public VideoAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.video_0, parent, false);
-
-            return new MyViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(final VideoAdapter.MyViewHolder holder, int position) {
-            HashMap<String, String> photoAlbumDetail = VideoList.get(position);
-
-            holder.albumArt.setImageResource(R.drawable.folder);
-            holder.albumTitle.setText(photoAlbumDetail.get("key_album"));
-            holder.albumCount.setText(photoAlbumDetail.get("key_countPhoto"));
-
-            long millis = Long.parseLong(photoAlbumDetail.get("key_timestamp"))*1000L;
-            Date d = new Date(millis);
-            DateFormat df=new SimpleDateFormat("dd-MM-yyyy  HH:mm");
-            df.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-            holder.albumModified.setText(df.format(d));
-
-            holder.VdCardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, Video1.class);
-                    intent.putExtra("key_albumName", VideoList.get(holder.getAdapterPosition()).get("key_album"));
-                    startActivityForResult(intent, 502);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return VideoList.size();
-        }
-
-        class MyViewHolder extends RecyclerView.ViewHolder{
-
-            private TextView albumTitle, albumCount, albumModified;
-            private CardView VdCardView;
-            private ImageView albumArt;
-            public MyViewHolder(View itemView) {
-                super(itemView);
-                albumTitle = itemView.findViewById(R.id.txtVdFolderName);
-                albumCount = itemView.findViewById(R.id.txtVdCount);
-                albumModified = itemView.findViewById(R.id.txtVdModifiedDate);
-                albumArt = itemView.findViewById(R.id.imgVdFolderIcon);
-
-                VdCardView = itemView.findViewById(R.id.VdCardView);
+    {
+        observer_1 = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                new LoadPhotoAlbumList().execute();
             }
+        };
+
+        observer_2 = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                new LoadVideoAlbumList().execute();
+            }
+        };
+    }
+    ContentObserver observer_1, observer_2;
+    private void registerContentObserver() {
+        unregisterContentObserver();
+
+        getContentResolver().registerContentObserver(MediaStore.Images.Media.INTERNAL_CONTENT_URI, true, observer_1);
+        getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true, observer_1);
+        getContentResolver().registerContentObserver(MediaStore.Video.Media.INTERNAL_CONTENT_URI, true, observer_2);
+        getContentResolver().registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, observer_2);
+
+    }
+    private void unregisterContentObserver() {
+        try {
+            getContentResolver().unregisterContentObserver(observer_1);
+            getContentResolver().unregisterContentObserver(observer_2);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+
 
     @Override
-    public void onBackPressed() {
-        if (pageNumber==1) mViewPager.setCurrentItem(0);
-        else super.onBackPressed();
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case 101:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {loadAlbum();break;}
+                else Toast.makeText(MainActivity.this, "You must give access to storage.", Toast.LENGTH_LONG).show();
             }
         }
-        return false;
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterContentObserver();
+    }
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem()!=0) mViewPager.setCurrentItem(0);
+        else super.onBackPressed();
     }
 }
 

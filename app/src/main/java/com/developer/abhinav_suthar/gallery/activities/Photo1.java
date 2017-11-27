@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MergeCursor;
 import android.media.MediaScannerConnection;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.view.MenuItemCompat;
@@ -86,6 +88,7 @@ public class Photo1 extends AppCompatActivity {
 
         LoadAlbum loadAlbum = new LoadAlbum();
         loadAlbum.execute(albumName);
+        registerContentObserver();
     }
 
 
@@ -1061,6 +1064,50 @@ public class Photo1 extends AppCompatActivity {
                 Toast.makeText(context, "1"+e.toString(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+
+    ContentObserver observer_1, observer_2;
+
+    private void registerContentObserver()
+    {
+        unregisterContentObserver();
+
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true,
+                observer_1 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        LoadAlbum loadAlbum = new LoadAlbum();
+                        loadAlbum.execute(albumName);
+                    }
+                }
+        );
+        getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI, true,
+                observer_2 = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        LoadAlbum loadAlbum = new LoadAlbum();
+                        loadAlbum.execute(albumName);
+                    }
+                }
+        );
+
+    }
+
+    private void unregisterContentObserver()
+    {
+        try {
+            getContentResolver().unregisterContentObserver(observer_1);
+            getContentResolver().unregisterContentObserver(observer_2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterContentObserver();
     }
 
     @Override
