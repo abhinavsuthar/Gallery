@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.os.IBinder;
@@ -27,101 +29,124 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class BackgroundVideoPlay extends Service {
+
     private AudioManager audioManager;
-    private static ArrayList<HashMap<String,String>> videoList;
-    private int p,videoPos;
-    private static MediaPlayer m;
-    private AudioManager.OnAudioFocusChangeListener listener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int i) {
-            if (m!=null){
-                switch (i) {
-                    case AudioManager.AUDIOFOCUS_GAIN:
-                        m.setVolume(1F,1F);
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS:
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        m.pause();
-                        audioManager.abandonAudioFocus(listener);
-                        contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        startForeground(5198, notification);
-                        updateNotificationTime = false;
-                        stopForeground(false);
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        m.setVolume(0.1F,0.1F);
-                        break;
+    private static MediaPlayer mediaPlayer;
+    private static ArrayList<HashMap<String,String>> mediaList;
+    private int index;
+    private static boolean isMusic = false, shuffle;
+    private AudioManager.OnAudioFocusChangeListener listener;{
+        listener = new AudioManager.OnAudioFocusChangeListener() {
+            @Override
+            public void onAudioFocusChange(int i) {
+                if (mediaPlayer!=null){
+                    switch (i) {
+                        case AudioManager.AUDIOFOCUS_GAIN:
+                            mediaPlayer.setVolume(1F,1F);
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS:
+                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                            mediaPlayer.pause();
+                            pauseMediaPlayer();
+                            break;
+                        case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                            mediaPlayer.setVolume(0.1F,0.1F);
+                            break;
+                    }
                 }
             }
-        }
-    };
+        };
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        videoList = Utils.getMediaList();
-        p = intent.getIntExtra("video_number",0);
-        videoPos = intent.getIntExtra("video_position",0);
+        mediaPlayer = new MediaPlayer();
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        int result = audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
-            registerBroadcastReceiver();
-            playVideo();
-        }else Toast.makeText(getApplicationContext(), "No audio focus", Toast.LENGTH_SHORT).show();
 
-        return super.onStartCommand(intent, flags, startId);
+        index = intent.getIntExtra("video_number",0);
+        int videoPos = intent.getIntExtra("video_position", 0);
+        isMusic = intent.getBooleanExtra("Audio", false);
+        shuffle = intent.getBooleanExtra("shuffle", true);
+
+
+        mediaList = (isMusic) ?  Utils.getMusicList() : Utils.getMediaList();
+
+        playVideo();
+        mediaPlayer.seekTo(videoPos);
+        registerBroadcastReceiver();
+
+        return START_NOT_STICKY;
     }
 
     private void playVideo(){
-        m = new MediaPlayer();
+
+
+
         try {
-            m.setDataSource(videoList.get(p).get("key_path"));
-            m.prepare();
-            m.seekTo(videoPos);
-            videoPos=0;
-            m.start();
-            showNotification();
-            m.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    p++;
-                    if (p==videoList.size()) {
-                        p--;
-                        m.pause();
-                        m.seekTo(0);
-                        audioManager.abandonAudioFocus(listener);
-                        contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        startForeground(5198, notification);
-                        stopForeground(false);
-                    }else{
-                        m.stop();
-                        m.release();
-                        m=null;
-                        playVideo();
-                    }
-                }
-            });
+            mediaPlayer.setDataSource(mediaList.get(index).get("key_path"));
+            mediaPlayer.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
-            m.stop();
-            m.release();
-            m=null;
+            Toast.makeText(getApplicationContext(), "Something wrong happened!", Toast.LENGTH_SHORT).show();
             stopSelf();
         }
+
+
+
+
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                int result = audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                if (result==AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                    mp.start();
+                    showNotification();
+                }else Toast.makeText(getApplicationContext(), "Can't play! Some other player is using audio!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if (shuffle) index = new Random().nextInt(mediaList.size());
+                if (index == mediaList.size()-1)
+                    pauseMediaPlayer();
+                else {
+                    index++; mediaPlayer.reset(); playVideo();
+                }
+            }
+        });
+
+
     }
 
+
+    //--------------------------------------------------------------------------------------------//
+    //All about showing notification
     private RemoteViews contentView;
     private Notification notification;
+    private Timer vdNotiTimeTimer;
+    private boolean updateNotificationTime = true;
     private void showNotification(){
         contentView = new RemoteViews(getPackageName(), R.layout.video_playback_noti);
-        File f = new File(videoList.get(p).get("key_path"));
-        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoList.get(p).get("key_path"), MediaStore.Video.Thumbnails.MICRO_KIND);
-        contentView.setImageViewBitmap(R.id.noti_album_art, bitmap);
+        File f = new File(mediaList.get(index).get("key_path"));
+
+        if (isMusic)
+            musicAlbumArt();
+        else{
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(mediaList.get(index).get("key_path"), MediaStore.Video.Thumbnails.MICRO_KIND);
+            contentView.setImageViewBitmap(R.id.noti_album_art, bitmap);
+        }
+
         contentView.setImageViewResource(R.id.noti_vd_prev, R.drawable.ic_previous);
         contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_pause);
         contentView.setImageViewResource(R.id.noti_vd_next, R.drawable.ic_next);
@@ -129,9 +154,10 @@ public class BackgroundVideoPlay extends Service {
 
         Intent intent = new Intent(this, Video2.class);
         intent.setAction("notificationVideoAction");
-        intent.putExtra("key_position", p);
+        intent.putExtra("key_position", index);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent playVideo = PendingIntent.getActivity(this,500,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        if (isMusic) playVideo = null;
 
         Notification.Builder mBuilder = new Notification.Builder(getApplicationContext())
                 .setSmallIcon(R.mipmap.launcher)
@@ -165,18 +191,15 @@ public class BackgroundVideoPlay extends Service {
         startForeground(5198, notification);
         notificationTime();
     }
-
-    private Timer vdNotiTimeTimer;
-    private boolean updateNotificationTime = true;
     private void notificationTime(){
         try {
             vdNotiTimeTimer.cancel();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
+
+
         vdNotiTimeTimer = new Timer();
-        long duration = m.getCurrentPosition();
-        final Date d2 = new Date(m.getDuration());
+        long duration = mediaPlayer.getCurrentPosition();
+        final Date d2 = new Date(mediaPlayer.getDuration());
         duration = duration/1000L;
         final DateFormat df;
         if (duration<3600) df = new SimpleDateFormat("mm:ss");
@@ -188,11 +211,10 @@ public class BackgroundVideoPlay extends Service {
             public void run() {
                 if (updateNotificationTime){
                     int position = 0;
-                    try {
-                        position = m.getCurrentPosition();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+
+                    try { position = mediaPlayer.getCurrentPosition();
+                    } catch (Exception ignored) {}
+
                     Date d = new Date(position);
                     contentView.setTextViewText(R.id.noti_vd_time, df.format(d)+"/"+df.format(d2));
                     startForeground(5198, notification);
@@ -200,7 +222,64 @@ public class BackgroundVideoPlay extends Service {
             }
         },0,1000);
     }
+    private void musicAlbumArt(){
+        try {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(mediaList.get(index).get("key_path"));
+            byte [] data = mmr.getEmbeddedPicture();
+            if (data==null) contentView.setImageViewResource(R.id.noti_album_art, R.drawable.ic_audio_bg);
+            else {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                contentView.setImageViewBitmap(R.id.noti_album_art, bitmap);
+            }
+        } catch (IllegalArgumentException e) {
+            contentView.setImageViewResource(R.id.noti_album_art, R.drawable.ic_audio_bg);
+        }
+    }
+    private void pauseMediaPlayer(){
+        audioManager.abandonAudioFocus(listener);
+        contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
+        startForeground(5198, notification);
+        updateNotificationTime = false;
+        stopForeground(false);
+    }
 
+
+
+    public static MediaPlayer getMediaPlayer(){return  mediaPlayer;}
+    public static int stopVideo(){
+        try {
+            if (mediaPlayer!=null){
+                int videoPos = mediaPlayer.getCurrentPosition();
+                mediaPlayer.stop();
+                mediaPlayer.release();
+                if (!isMusic) Utils.setMediaList(mediaList);
+                return videoPos;
+            }else return 0;
+        } catch (IllegalStateException e) {
+            return 0;
+        }
+    }
+    @Override
+    public void onDestroy() {
+        stopVideo();
+        try {
+            vdNotiTimeTimer.cancel();
+            unregisterReceiver(handler);
+            audioManager.abandonAudioFocus(listener);
+            stopForeground(true);
+        } catch (Exception ignored) {}
+        super.onDestroy();
+    }
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+
+
+    //Notification click event handler
     NotificationActionHandler handler = new NotificationActionHandler();
     private void registerBroadcastReceiver(){
         IntentFilter filter = new IntentFilter();
@@ -212,104 +291,67 @@ public class BackgroundVideoPlay extends Service {
         filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         this.registerReceiver(handler, filter);
     }
-
-    public static int stopVideo(){
-        try {
-            if (m!=null){
-                int videoPos = m.getCurrentPosition();
-                m.stop();
-                m.release();
-                m=null;
-                Utils.setMediaList(videoList);
-                return videoPos;
-            }else return 0;
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public void onDestroy() {
-        stopVideo();
-        try {
-            vdNotiTimeTimer.cancel();
-            unregisterReceiver(handler);
-            audioManager.abandonAudioFocus(listener);
-            stopForeground(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        super.onDestroy();
-    }
-
     private class NotificationActionHandler extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction()==null) return;
             switch (intent.getAction()){
+
+
+
                 case "prev":
-                    if (m.getCurrentPosition()>7000){
-                        m.seekTo(0);
-                    }else {
-                        m.stop();
-                        m.release();
-                        m=null;
-                        p--;
-                        if (p<0) p++;
+                    if (mediaPlayer.getCurrentPosition()>7000)
+                        mediaPlayer.seekTo(0);
+                    else if (index!=1){
+                        index--;
                         audioManager.abandonAudioFocus(listener);
-                        audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                        playVideo();
+                        mediaPlayer.reset(); playVideo();
                         updateNotificationTime = true;
-                    }
-                    break;
+                    }break;
+
+
+
                 case "play":
-                    if (m.isPlaying()) {
-                        m.pause();
-                        audioManager.abandonAudioFocus(listener);
-                        contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                        startForeground(5198, notification);
-                        updateNotificationTime = false;
-                        stopForeground(false);
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.pause();
+                        pauseMediaPlayer();
                     }
                     else {
                         int result = audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
-                            m.start();
+                            mediaPlayer.start();
                             contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_pause);
                             startForeground(5198, notification);
                             updateNotificationTime = true;
-                        }else Toast.makeText(getApplicationContext(), "Another application is using audio", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
+                        }else Toast.makeText(getApplicationContext(), "Can't play! Some other player is using audio!", Toast.LENGTH_SHORT).show();
+                    }break;
+
+
+
                 case "next":
-                    m.stop();
-                    m.release();
-                    m=null;
-                    p++;
-                    if (p==videoList.size()) p--;
-                    audioManager.abandonAudioFocus(listener);
-                    audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                    playVideo();
-                    updateNotificationTime = true;
-                    break;
+                    if (shuffle) index = new Random().nextInt(mediaList.size());
+                    if (index == mediaList.size()-1)
+                        pauseMediaPlayer();
+                    else {
+                        index++; mediaPlayer.reset(); playVideo();
+                        updateNotificationTime = true;
+                    } break;
+
+
+
                 case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
-                    m.pause();
-                    audioManager.abandonAudioFocus(listener);
-                    contentView.setImageViewResource(R.id.noti_vd_play, R.drawable.ic_play);
-                    startForeground(5198, notification);
-                    updateNotificationTime = false;
-                    stopForeground(false);
+                    mediaPlayer.pause();
+                    pauseMediaPlayer();
                     break;
+
+
                 case "stopService":
                     stopSelf();
                     break;
+
+
                 default:
                     Toast.makeText(getApplicationContext(), "Error occurred", Toast.LENGTH_SHORT).show();
                     break;

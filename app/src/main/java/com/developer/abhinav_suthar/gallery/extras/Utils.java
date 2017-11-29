@@ -22,6 +22,12 @@ public class Utils {
     public static ArrayList<HashMap<String, String>> getMediaList(){return mediaList; }
 
     //--------------------------------------------------------------------------------------------//
+    //AudioList stored for Audio to Background Play service
+    private static ArrayList<HashMap<String, String>> musicList = new ArrayList<>();
+    public static void setMusicList(ArrayList<HashMap<String, String>> musicListt){musicList = musicListt;}
+    public static ArrayList<HashMap<String, String>> getMusicList(){return musicList; }
+
+    //--------------------------------------------------------------------------------------------//
     //Send data to copy service to get which item it has to copy
     private static Boolean[] selectedMediaItems;
     public static void setSelectedMediaItems(Boolean[] b){

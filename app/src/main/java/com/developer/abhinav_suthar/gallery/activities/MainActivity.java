@@ -37,6 +37,7 @@ import com.developer.abhinav_suthar.gallery.adapters.Main_AudioAdapter;
 import com.developer.abhinav_suthar.gallery.adapters.Main_PhotoAdapter;
 import com.developer.abhinav_suthar.gallery.adapters.Main_VideoAdapter;
 import com.developer.abhinav_suthar.gallery.extras.Utils;
+import com.developer.abhinav_suthar.gallery.fragments.Music;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            if (position==2) return new Music();
             return PlaceholderFragment.newInstance(position + 1);
         }
 
@@ -127,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
-        public PlaceholderFragment() {}
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
             }else if (sectionNumber==2){
                 return inflater.inflate(R.layout.tab2_videos, container, false);
             }else if (sectionNumber==3) {
-                return inflater.inflate(R.layout.tab2_videos, container, false);
+                return inflater.inflate(R.layout.tab3_audio, container, false);
             }return null;
         }
 
@@ -284,67 +286,60 @@ public class MainActivity extends AppCompatActivity {
     }
     private class LoadAudioList extends AsyncTask<String, Void, String> {
 
-        private ArrayList<HashMap<String, String>> VideoList = new ArrayList<>();
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+        ArrayList<HashMap<String,String>> music_list = new ArrayList<>();
 
         @Override
         protected String doInBackground(String... strings) {
 
-            String path;
-            String name;
-            String timestamp;
-            String duration;
-
             Uri uriExternal = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            Uri uriInternal = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 
-            String[] projection = {MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DATE_MODIFIED,
-                    MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DURATION};
-            Cursor cursorExternal = getContentResolver().query(uriExternal, projection, null, null, null);
-            Cursor cursorInternal = getContentResolver().query(uriInternal, projection, null, null, null);
-            Cursor cursor = new MergeCursor(new Cursor[]{cursorExternal, cursorInternal});
+            String[] projection = {MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.TITLE
+                    , MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.DURATION
+                    , MediaStore.Audio.Media._ID, MediaStore.Images.Media.DATA};
+            Cursor cur = getContentResolver().query(uriExternal, projection, null, null, null);
 
-            while (cursor.moveToNext()) {
 
-                path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                timestamp = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED));
-                duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED));
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("key_path", path);
-                temp.put("key_name", name);
-                temp.put("key_timestamp", timestamp);
-                temp.put("key_duration", duration);
+            if (cur != null) {
+                while (cur.moveToNext()) {
+                    int artistColumn    = cur.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                    int titleColumn     = cur.getColumnIndex(MediaStore.Audio.Media.TITLE);
+                    int albumColumn     = cur.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+                    int durationColumn  = cur.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
+                    int idColumn        = cur.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+                    int filePathIndex   = cur.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 
-                VideoList.add(temp);
+                    HashMap<String, String> song_detail = new HashMap<>();
+                    song_detail.put("key_artist",   cur.getString(artistColumn));
+                    song_detail.put("key_title",    cur.getString(titleColumn));
+                    song_detail.put("key_album",    cur.getString(albumColumn));
+                    song_detail.put("key_duration", cur.getString(durationColumn));
+                    song_detail.put("key_id",       cur.getString(idColumn));
+                    song_detail.put("key_path",     cur.getString(filePathIndex));
+                    music_list.add(song_detail);
+
+                }
+                cur.close();
             }
-            if (cursorExternal != null) cursorExternal.close();
-            if (cursorInternal != null) cursorInternal.close();
-            cursor.close();
-            return "Abhi";
+
+            return "Suthar";
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
 
-            Toast.makeText(MainActivity.this, ""+VideoList.size(), Toast.LENGTH_SHORT).show();
+            if (music_list.isEmpty()) return;
+            Utils.setMusicList(music_list);
 
-            final RecyclerView recyclerView = findViewById(R.id.viewVideos);
-            Main_AudioAdapter adapter = new Main_AudioAdapter(VideoList);
-
+            RecyclerView recyclerView = findViewById(R.id.viewAudio);
+            Main_AudioAdapter adapter = new Main_AudioAdapter(context, music_list);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
-
             if(recyclerView!=null){
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setAdapter(adapter);
             }
-            Utils.VideoAlbumDetails(VideoList);
+
         }
     }
 

@@ -387,12 +387,17 @@ public class Video2 extends AppCompatActivity{
     }
     private void fixVideoOrientation(){
         //VideoResolution
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(videoList.get(p).get("key_path"));
-        Bitmap bmp = retriever.getFrameAtTime();
-        int height=bmp.getHeight();
-        int width=bmp.getWidth();
-        float videoProportion = (float) width/(float) height;
+        float videoProportion = 0;
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(videoList.get(p).get("key_path"));
+            Bitmap bmp = retriever.getFrameAtTime();
+            int height=bmp.getHeight();
+            int width=bmp.getWidth();
+            videoProportion = (float) width/(float) height;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
 
         //Current screen resolution
         DisplayMetrics displayMetrics = new DisplayMetrics();
