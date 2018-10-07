@@ -10,13 +10,11 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/tab_3_fab"
-        android:layout_width="wrap_content"
+    <include
+        android:visibility="gone"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_play"
-        android:tint="#FFF"
-        android:layout_gravity="end|bottom"/>
+        android:layout_gravity="bottom"
+        layout="@layout/ad_bottom_nowplaying_card"/>
 
 </FrameLayout>

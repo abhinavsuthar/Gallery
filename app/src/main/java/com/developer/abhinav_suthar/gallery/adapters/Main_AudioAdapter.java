@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.developer.abhinav_suthar.gallery.R;
-import com.developer.abhinav_suthar.gallery.fragments.Music;
 import com.developer.abhinav_suthar.gallery.services.BackgroundVideoPlay;
 
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ public class Main_AudioAdapter extends RecyclerView.Adapter<Main_AudioAdapter.My
 
 
     private Context context;
+    private MediaPlayer musicPlayer;
     private ArrayList<HashMap<String, String>> AudioList = new ArrayList<>();
 
     public Main_AudioAdapter(Context context, ArrayList<HashMap<String, String>> AudioList){
@@ -81,6 +82,28 @@ public class Main_AudioAdapter extends RecyclerView.Adapter<Main_AudioAdapter.My
                 intent.putExtra("Audio", true);
                 context.startService(intent);
 
+                //view.findViewById(R.id.ad_bottom_panel_Container).setVisibility(View.VISIBLE);
+/*
+                TextView title = view.findViewById(R.id.ad_bottom_panel_title);
+                TextView artist = view.findViewById(R.id.ad_bottom_panel_artist);
+                ImageView album_art = view.findViewById(R.id.ad_bottom_panel_album_art_nowplayingcard);
+                title.setText(AudioList.get(holder.getAdapterPosition()).get("key_title"));
+                artist.setText(AudioList.get(holder.getAdapterPosition()).get("key_artist"));
+                MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                mmr.setDataSource(AudioList.get(holder.getAdapterPosition()).get("key_path"));
+                byte [] data = mmr.getEmbeddedPicture();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                album_art.setImageBitmap(bitmap);
+
+                musicPlayer = BackgroundVideoPlay.getMediaPlayer();
+                view.findViewById(R.id.ad_bottom_panel_play_pause).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (musicPlayer==null) return;
+                        if (musicPlayer.isPlaying()) musicPlayer.pause();
+                        else musicPlayer.start();
+                    }
+                });*/
                 //Music.musicPlayer = BackgroundVideoPlay.getMediaPlayer();
 
             }

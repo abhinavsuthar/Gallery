@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         loadAlbum();
         registerContentObserver();
-
     }
 
     private void loadAlbum(){

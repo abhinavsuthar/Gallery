@@ -42,7 +42,6 @@ public class Music extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         recyclerView = view.findViewById(R.id.tab_3_music);
         new LoadAudioList().execute();
-        playControls(view);
     }
 
     private class LoadAudioList extends AsyncTask<String, Void, String> {
@@ -105,16 +104,4 @@ public class Music extends Fragment {
     }
 
 
-    private void playControls(View view){
-
-        view.findViewById(R.id.tab_3_fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                musicPlayer = BackgroundVideoPlay.getMediaPlayer();
-                if (musicPlayer==null) return;
-                if (musicPlayer.isPlaying()) musicPlayer.pause();
-                else musicPlayer.start();
-            }
-        });
-    }
 }
